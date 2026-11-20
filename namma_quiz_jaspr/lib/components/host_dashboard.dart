@@ -3,6 +3,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:namma_kahoot_client/namma_kahoot_client.dart';
+import 'package:universal_web/web.dart' as web;
 import '../providers/client_provider.dart';
 import '../providers/game_provider.dart';
 import 'countdown_timer.dart';
@@ -17,6 +18,7 @@ class HostDashboard extends StatefulComponent {
 class _HostDashboardState extends State<HostDashboard> {
   List<Quiz> quizzes = [];
   bool loadingQuizzes = true;
+  bool _showQrModal = false;
 
   @override
   void initState() {
@@ -159,6 +161,10 @@ class _HostDashboardState extends State<HostDashboard> {
   }
 
   Component _buildLobby(BuildContext context, GameState gameState) {
+    final pin = gameState.session?.pin ?? '...';
+    final origin = web.window.location.origin;
+    final joinUrl = '$origin/play?pin=$pin';
+
     return div(classes: 'scr on bg-pattern flex-col', attributes: {'style': 'min-height: 100vh;'}, [
       div(classes: 'topbar', attributes: {'style': 'background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);'}, [
         button(
@@ -182,17 +188,85 @@ class _HostDashboardState extends State<HostDashboard> {
       ]),
 
       div(classes: 'content-wrap p24 flex-col', attributes: {'style': 'flex: 1;'}, [
-        // 1. Prominent PIN Block
-        div(classes: 'pin-block mb24', attributes: {'style': 'margin: 20px auto 32px; width: 100%;'}, [
-          div(classes: 'pin-label-t', [Component.text('Join with Game PIN')]),
-          div(classes: 'pin-digits', [Component.text(gameState.session?.pin ?? '...')]),
-          div(attributes: {
-            'style': 'margin-top: 10px; font-size: 16px; font-weight: 700; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; gap: 6px;',
-          }, [
-            i([], classes: 'ti ti-world', attributes: {'style': 'color: var(--brand-purple);'}),
-            Component.text('Go to nammaquiz.com/play'),
+        // 1. Split Hero: PIN Block + QR Code Card
+        div(classes: 'lobby-hero-grid', [
+          // Left: PIN Display Block
+          div(classes: 'pin-block', attributes: {'style': 'display: flex; flex-direction: column; justify-content: center;'}, [
+            div(classes: 'pin-label-t', [Component.text('Join with Game PIN')]),
+            div(classes: 'pin-digits', [Component.text(pin)]),
+            div(attributes: {
+              'style': 'margin-top: 10px; font-size: 15px; font-weight: 700; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; gap: 6px;',
+            }, [
+              i([], classes: 'ti ti-world', attributes: {'style': 'color: var(--brand-purple); font-size: 17px;'}),
+              Component.text('Go to $origin/play'),
+            ]),
+            div(attributes: {'style': 'margin-top: 16px;'}, [
+              button(
+                type: ButtonType.button,
+                classes: 'btn btn-white btn-sm',
+                events: {'click': (e) => setState(() => _showQrModal = true)},
+                [
+                  i([], classes: 'ti ti-maximize', attributes: {'style': 'font-size: 15px;'}),
+                  Component.text('Enlarge QR Code'),
+                ],
+              ),
+            ]),
+          ]),
+
+          // Right: QR Code Card
+          div(classes: 'qr-card', [
+            div(classes: 'qr-wrapper', attributes: {
+              'id': 'host-lobby-qr',
+              'data-qr-text': joinUrl,
+              'data-qr-size': '160',
+            }, []),
+            div(classes: 'chip chip-p mb8', [
+              i([], classes: 'ti ti-scan', attributes: {'style': 'font-size: 14px;'}),
+              Component.text('Scan to Join'),
+            ]),
+            div(attributes: {'style': 'font-size: 12px; color: var(--color-text-secondary); font-weight: 600;'}, [
+              Component.text('Direct camera scan connects with PIN prefilled'),
+            ]),
           ]),
         ]),
+
+        // Fullscreen QR Modal (for auditorium/projector view)
+        if (_showQrModal)
+          div(classes: 'scanner-overlay', [
+            div(classes: 'scanner-dialog', attributes: {'style': 'max-width: 500px; padding: 32px 24px;'}, [
+              div(attributes: {'style': 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;'}, [
+                div(attributes: {'style': 'font-size: 20px; font-weight: 900; color: var(--color-text-primary);'}, [
+                  Component.text('Scan to Join Game'),
+                ]),
+                button(
+                  type: ButtonType.button,
+                  classes: 'btn btn-icon btn-white btn-sm',
+                  events: {'click': (e) => setState(() => _showQrModal = false)},
+                  [i([], classes: 'ti ti-x', attributes: {'style': 'font-size: 18px;'}),],
+                ),
+              ]),
+              div(classes: 'qr-wrapper', attributes: {
+                'id': 'host-modal-qr',
+                'data-qr-text': joinUrl,
+                'data-qr-size': '260',
+                'style': 'min-height: 280px; min-width: 280px; margin: 0 auto 16px;',
+              }, []),
+              div(attributes: {
+                'style': 'font-size: clamp(36px, 7vw, 56px); font-weight: 900; letter-spacing: 8px; font-family: var(--font-mono); color: var(--brand-purple); margin-bottom: 8px;',
+              }, [
+                Component.text(pin),
+              ]),
+              p(classes: 't-sub', [
+                Component.text('Point any smartphone camera to connect to the session immediately.'),
+              ]),
+              button(
+                type: ButtonType.button,
+                classes: 'btn btn-dark btn-full mt16',
+                events: {'click': (e) => setState(() => _showQrModal = false)},
+                [Component.text('Close Full View')],
+              ),
+            ]),
+          ]),
 
         // 2. Action Bar
         div(classes: 'frow mb24', attributes: {'style': 'padding: 0 4px;'}, [

@@ -4,6 +4,7 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import '../providers/game_provider.dart';
+import 'qr_scanner_modal.dart';
 
 class PlayerBoard extends StatefulComponent {
   final String? initialPin;
@@ -18,6 +19,7 @@ class _PlayerBoardState extends State<PlayerBoard> {
   String username = '';
   bool isJoining = false;
   String? errorMessage;
+  bool _showScanner = false;
 
   @override
   void initState() {
@@ -146,7 +148,19 @@ class _PlayerBoardState extends State<PlayerBoard> {
             },
             [
               div(classes: 'fgroup', [
-                label(classes: 'flabel', [Component.text('Game PIN')]),
+                div(classes: 'frow mb8', [
+                  label(classes: 'flabel', attributes: {'style': 'margin-bottom: 0;'}, [Component.text('Game PIN')]),
+                  button(
+                    type: ButtonType.button,
+                    classes: 'btn btn-white btn-sm',
+                    attributes: {'style': 'padding: 4px 10px; font-size: 12px; gap: 4px;'},
+                    events: {'click': (e) => setState(() => _showScanner = true)},
+                    [
+                      i([], classes: 'ti ti-scan', attributes: {'style': 'color: var(--brand-purple); font-size: 14px;'}),
+                      Component.text('Scan QR'),
+                    ],
+                  ),
+                ]),
                 input(
                   classes: 'finput',
                   type: InputType.text,
@@ -186,6 +200,16 @@ class _PlayerBoardState extends State<PlayerBoard> {
                   Component.text(isJoining ? ' Connecting to Arena...' : ' Join Game Now'),
                 ],
               ),
+              button(
+                type: ButtonType.button,
+                classes: 'btn btn-white btn-full mt12',
+                attributes: {'style': 'font-size: 14px; padding: 12px; cursor: pointer;'},
+                events: {'click': (e) => setState(() => _showScanner = true)},
+                [
+                  i([], classes: 'ti ti-camera', attributes: {'style': 'font-size: 16px; color: var(--brand-purple);'}),
+                  Component.text('Scan Host Screen with Camera'),
+                ],
+              ),
             ],
           ),
           div(attributes: {
@@ -195,6 +219,22 @@ class _PlayerBoardState extends State<PlayerBoard> {
             Component.text('Works seamlessly on mobile & desktop'),
           ]),
         ]),
+
+        // Camera QR Scanner Modal
+        if (_showScanner)
+          QrScannerModal(
+            onPinScanned: (scannedPin) {
+              setState(() {
+                pin = scannedPin;
+                _showScanner = false;
+                errorMessage = null;
+              });
+              if (username.trim().isNotEmpty) {
+                _handleJoin();
+              }
+            },
+            onClose: () => setState(() => _showScanner = false),
+          ),
       ]),
     ]);
   }

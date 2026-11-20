@@ -1189,3 +1189,138 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   flex-wrap: wrap;
   gap: 12px;
 }
+
+/* =========================================================================
+   QR CODE & CAMERA SCANNER STYLES
+   ========================================================================= */
+.lobby-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  align-items: stretch;
+  max-width: 900px;
+  margin: 20px auto 32px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .lobby-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.qr-card {
+  background: #FFFFFF;
+  border-radius: 18px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--color-border-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-wrapper {
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px var(--color-border-primary);
+  margin-bottom: 10px;
+  min-height: 180px;
+  min-width: 180px;
+}
+
+.qr-wrapper img, .qr-wrapper canvas {
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* SCANNER MODAL */
+.scanner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(14, 16, 23, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.scanner-dialog {
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+  text-align: center;
+}
+
+.scanner-viewfinder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000000;
+  margin: 16px 0;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.scanner-viewfinder video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Animated Laser Scan Beam */
+.scanner-laser {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #26890C, #5DCAA5, transparent);
+  box-shadow: 0 0 16px 2px #26890C;
+  z-index: 10;
+  animation: scanLaser 2.2s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes scanLaser {
+  0% { top: 8%; opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { top: 92%; opacity: 0.6; }
+}
+
+/* Viewfinder Target Reticle Corners */
+.scanner-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: #5DCAA5;
+  border-style: solid;
+  z-index: 11;
+  pointer-events: none;
+}
+.scanner-corner.tl { top: 14px; left: 14px; border-width: 4px 0 0 4px; border-radius: 6px 0 0 0; }
+.scanner-corner.tr { top: 14px; right: 14px; border-width: 4px 4px 0 0; border-radius: 0 6px 0 0; }
+.scanner-corner.bl { bottom: 14px; left: 14px; border-width: 0 0 4px 4px; border-radius: 0 0 0 6px; }
+.scanner-corner.br { bottom: 14px; right: 14px; border-width: 0 4px 4px 0; border-radius: 0 0 6px 0; }
+

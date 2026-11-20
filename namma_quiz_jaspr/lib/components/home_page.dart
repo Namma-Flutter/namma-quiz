@@ -1,6 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
+import 'qr_scanner_modal.dart';
 
 class HomePage extends StatefulComponent {
   const HomePage({super.key});
@@ -11,6 +12,7 @@ class HomePage extends StatefulComponent {
 
 class _HomePageState extends State<HomePage> {
   String _pin = '';
+  bool _showScanner = false;
 
   void _handleJoin() {
     final cleanPin = _pin.trim();
@@ -209,6 +211,16 @@ class _HomePageState extends State<HomePage> {
                         Component.text('Enter Game PIN'),
                       ],
                     ),
+                    button(
+                      type: ButtonType.button,
+                      classes: 'btn btn-white btn-full mt12',
+                      attributes: {'style': 'font-size: 14px; padding: 12px; cursor: pointer;'},
+                      events: {'click': (e) => setState(() => _showScanner = true)},
+                      [
+                        i([], classes: 'ti ti-scan', attributes: {'style': 'font-size: 18px; color: var(--brand-purple);'}),
+                        Component.text('Scan Host QR Code'),
+                      ],
+                    ),
                   ],
                 ),
 
@@ -222,6 +234,19 @@ class _HomePageState extends State<HomePage> {
             ]),
           ]),
         ]),
+
+        // Camera QR Scanner Modal
+        if (_showScanner)
+          QrScannerModal(
+            onPinScanned: (scannedPin) {
+              setState(() {
+                _pin = scannedPin;
+                _showScanner = false;
+              });
+              _handleJoin();
+            },
+            onClose: () => setState(() => _showScanner = false),
+          ),
       ]),
 
       // Bento Feature Showcase (Anti-Slop Craft)
