@@ -10,9 +10,10 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-abstract class Player implements _i1.SerializableModel {
+abstract class Player
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   Player._({
     this.id,
     required this.gameSessionId,
@@ -49,7 +50,7 @@ abstract class Player implements _i1.SerializableModel {
 
   /// Returns a shallow copy of this [Player]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   Player copyWith({
     int? id,
     int? gameSessionId,
@@ -68,8 +69,19 @@ abstract class Player implements _i1.SerializableModel {
   }
 
   @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      '__className__': 'Player',
+      if (id != null) 'id': id,
+      'gameSessionId': gameSessionId,
+      'name': name,
+      'score': score,
+    };
+  }
+
+  @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -90,7 +102,7 @@ class _PlayerImpl extends Player {
 
   /// Returns a shallow copy of this [Player]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   Player copyWith({
     Object? id = _Undefined,

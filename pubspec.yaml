@@ -1,11 +1,10 @@
-name: _
+name: namma_quiz
 publish_to: none
 
 environment:
-  sdk: '^3.8.0'
+  sdk: '^3.12.0'
 
 workspace:
-  - namma_kahoot_client
-  - namma_kahoot_server
-  - namma_kahoot_jaspr
-
+  - namma_quiz_client
+  - namma_quiz_server
+  - namma_quiz_jaspr

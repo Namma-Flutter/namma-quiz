@@ -11,18 +11,22 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_test/serverpod_test.dart' as _i1;
-import 'package:serverpod/serverpod.dart' as _i2;
-import 'dart:async' as _i3;
-import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i4;
-import 'package:namma_kahoot_server/src/generated/kahoot/quiz.dart' as _i5;
-import 'package:namma_kahoot_server/src/generated/kahoot/question.dart' as _i6;
-import 'package:namma_kahoot_server/src/generated/kahoot/game_session.dart'
-    as _i7;
+import 'dart:async' as _ida;
+import 'dart:io' as _idi;
 import 'package:namma_kahoot_server/src/generated/kahoot/game_event.dart'
-    as _i8;
-import 'package:namma_kahoot_server/src/generated/kahoot/player.dart' as _i9;
+    as _i68w0vuw;
+import 'package:namma_kahoot_server/src/generated/kahoot/game_session.dart'
+    as _i7mvdyd7;
+import 'package:namma_kahoot_server/src/generated/kahoot/player.dart'
+    as _irte7cmr;
+import 'package:namma_kahoot_server/src/generated/kahoot/question.dart'
+    as _iih33dk0;
+import 'package:namma_kahoot_server/src/generated/kahoot/quiz.dart'
+    as _iiv8jun1;
+import 'package:serverpod/serverpod.dart' as _is;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _iacs;
+import 'package:serverpod_test/serverpod_test.dart' as _ist;
 import 'package:namma_kahoot_server/src/generated/protocol.dart';
 import 'package:namma_kahoot_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -46,6 +50,9 @@ export 'package:serverpod_test/serverpod_test_public_exports.dart';
 ///
 /// [enableSessionLogging] Whether session logging should be enabled. Defaults to `false`
 ///
+/// [ephemeralDatabase] Whether this group gets its own empty database, created when the group starts and dropped when it finishes. Defaults to `true`.
+/// Set this to `false` to use the database configured for [runMode], including a previously seeded database. [configOverride] can still replace that database. The configured database is not created or dropped, so groups that share it cannot run in parallel. [rollbackDatabase] still controls whether writes inside the group are rolled back.
+///
 /// [rollbackDatabase] Options for when to rollback the database during the test lifecycle.
 /// By default `withServerpod` does all database operations inside a transaction that is rolled back after each `test` case.
 /// Just like the following enum describes, the behavior of the automatic rollbacks can be configured:
@@ -67,7 +74,7 @@ export 'package:serverpod_test/serverpod_test_public_exports.dart';
 ///
 /// [serverpodLoggingMode] The logging mode used when creating Serverpod. Defaults to `ServerpodLoggingMode.normal`
 ///
-/// [serverpodStartTimeout] The timeout to use when starting Serverpod, which connects to the database among other things. Defaults to `Duration(seconds: 30)`.
+/// [serverpodStartTimeout] The timeout to use when starting Serverpod, which connects to the database among other things. Defaults to `Duration(seconds: 120)`.
 ///
 /// [testServerOutputMode] Options for controlling test server output during test execution. Defaults to `TestServerOutputMode.normal`.
 /// ```dart
@@ -92,41 +99,57 @@ export 'package:serverpod_test/serverpod_test_public_exports.dart';
 /// and before it is used to start the server. Use this to override particular
 /// settings in the server configuration.
 ///
+/// [databaseInterceptor] Optional interceptor that replaces the default database for each session.
+/// See [Serverpod.databaseInterceptor] for more information.
+///
 /// [testGroupTagsOverride] By default Serverpod test tools tags the `withServerpod` test group with `"integration"`.
 /// This is to provide a simple way to only run unit or integration tests.
 /// This property allows this tag to be overridden to something else. Defaults to `['integration']`.
 ///
 /// [experimentalFeatures] Optionally specify experimental features. See [Serverpod] for more information.
-@_i1.isTestGroup
+///
+/// [serverDirectory] The server package directory `config/<runMode>.yaml`, `config/passwords.yaml`,
+/// and `migrations/<module>/...` are resolved against. Defaults to
+/// [Directory.current] at the time the test boots. Pass this when the test
+/// isolate's cwd is not the server package root (e.g. running tests from a
+/// workspace parent directory) so config and migrations are still loaded
+/// from the right place.
+@_ist.isTestGroup
 void withServerpod(
   String testGroupName,
-  _i1.TestClosure<TestEndpoints> testClosure, {
+  _ist.TestClosure<TestEndpoints> testClosure, {
   bool? applyMigrations,
-  _i2.ServerpodConfig Function(_i2.ServerpodConfig)? configOverride,
+  _is.ServerpodConfig Function(_is.ServerpodConfig)? configOverride,
+  _is.DatabaseInterceptor? databaseInterceptor,
   bool? enableSessionLogging,
-  _i2.ExperimentalFeatures? experimentalFeatures,
-  _i1.RollbackDatabase? rollbackDatabase,
+  bool? ephemeralDatabase,
+  _is.ExperimentalFeatures? experimentalFeatures,
+  _ist.RollbackDatabase? rollbackDatabase,
   String? runMode,
-  _i2.RuntimeParametersListBuilder? runtimeParametersBuilder,
-  _i2.ServerpodLoggingMode? serverpodLoggingMode,
+  _is.RuntimeParametersListBuilder? runtimeParametersBuilder,
+  _idi.Directory? serverDirectory,
+  _is.ServerpodLoggingMode? serverpodLoggingMode,
   Duration? serverpodStartTimeout,
   List<String>? testGroupTagsOverride,
-  _i1.TestServerOutputMode? testServerOutputMode,
+  _ist.TestServerOutputMode? testServerOutputMode,
 }) {
-  _i1.buildWithServerpod<_InternalTestEndpoints>(
+  _ist.buildWithServerpod<_InternalTestEndpoints>(
     testGroupName,
-    _i1.TestServerpod(
+    _ist.TestServerpod(
       testEndpoints: _InternalTestEndpoints(),
       endpoints: Endpoints(),
       serializationManager: Protocol(),
       runMode: runMode,
       applyMigrations: applyMigrations,
+      ephemeralDatabase: ephemeralDatabase,
       isDatabaseEnabled: true,
       serverpodLoggingMode: serverpodLoggingMode,
       testServerOutputMode: testServerOutputMode,
+      serverDirectory: serverDirectory,
       experimentalFeatures: experimentalFeatures,
       configOverride: configOverride,
       runtimeParametersBuilder: runtimeParametersBuilder,
+      databaseInterceptor: databaseInterceptor,
     ),
     maybeRollbackDatabase: rollbackDatabase,
     maybeEnableSessionLogging: enableSessionLogging,
@@ -147,11 +170,11 @@ class TestEndpoints {
 }
 
 class _InternalTestEndpoints extends TestEndpoints
-    implements _i1.InternalTestEndpoints {
+    implements _ist.InternalTestEndpoints {
   @override
   void initialize(
-    _i2.SerializationManager serializationManager,
-    _i2.EndpointDispatch endpoints,
+    _is.SerializationManager serializationManager,
+    _is.EndpointDispatch endpoints,
   ) {
     emailIdp = _EmailIdpEndpoint(
       endpoints,
@@ -178,18 +201,18 @@ class _EmailIdpEndpoint {
     this._serializationManager,
   );
 
-  final _i2.EndpointDispatch _endpointDispatch;
+  final _is.EndpointDispatch _endpointDispatch;
 
-  final _i2.SerializationManager _serializationManager;
+  final _is.SerializationManager _serializationManager;
 
-  _i3.Future<_i4.AuthSuccess> login(
-    _i1.TestSessionBuilder sessionBuilder, {
+  _ida.Future<_iacs.AuthSuccess> login(
+    _ist.TestSessionBuilder sessionBuilder, {
     required String email,
     required String password,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'login',
           );
@@ -198,7 +221,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'login',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'email': email,
             'password': password,
           }),
@@ -209,7 +232,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i4.AuthSuccess>);
+                as _ida.Future<_iacs.AuthSuccess>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -217,13 +240,13 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<_i2.UuidValue> startRegistration(
-    _i1.TestSessionBuilder sessionBuilder, {
+  _ida.Future<_is.UuidValue> startRegistration(
+    _ist.TestSessionBuilder sessionBuilder, {
     required String email,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'startRegistration',
           );
@@ -232,7 +255,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'startRegistration',
-          parameters: _i1.testObjectToJson({'email': email}),
+          parameters: _ist.testObjectToJson({'email': email}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -240,7 +263,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i2.UuidValue>);
+                as _ida.Future<_is.UuidValue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -248,14 +271,14 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<String> verifyRegistrationCode(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required _i2.UuidValue accountRequestId,
+  _ida.Future<String> verifyRegistrationCode(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required _is.UuidValue accountRequestId,
     required String verificationCode,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'verifyRegistrationCode',
           );
@@ -264,7 +287,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'verifyRegistrationCode',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'accountRequestId': accountRequestId,
             'verificationCode': verificationCode,
           }),
@@ -275,7 +298,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<String>);
+                as _ida.Future<String>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -283,14 +306,14 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<_i4.AuthSuccess> finishRegistration(
-    _i1.TestSessionBuilder sessionBuilder, {
+  _ida.Future<_iacs.AuthSuccess> finishRegistration(
+    _ist.TestSessionBuilder sessionBuilder, {
     required String registrationToken,
     required String password,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'finishRegistration',
           );
@@ -299,7 +322,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'finishRegistration',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'registrationToken': registrationToken,
             'password': password,
           }),
@@ -310,7 +333,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i4.AuthSuccess>);
+                as _ida.Future<_iacs.AuthSuccess>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -318,13 +341,13 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<_i2.UuidValue> startPasswordReset(
-    _i1.TestSessionBuilder sessionBuilder, {
+  _ida.Future<_is.UuidValue> startPasswordReset(
+    _ist.TestSessionBuilder sessionBuilder, {
     required String email,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'startPasswordReset',
           );
@@ -333,7 +356,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'startPasswordReset',
-          parameters: _i1.testObjectToJson({'email': email}),
+          parameters: _ist.testObjectToJson({'email': email}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -341,7 +364,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i2.UuidValue>);
+                as _ida.Future<_is.UuidValue>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -349,14 +372,14 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<String> verifyPasswordResetCode(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required _i2.UuidValue passwordResetRequestId,
+  _ida.Future<String> verifyPasswordResetCode(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required _is.UuidValue passwordResetRequestId,
     required String verificationCode,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'verifyPasswordResetCode',
           );
@@ -365,7 +388,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'verifyPasswordResetCode',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'passwordResetRequestId': passwordResetRequestId,
             'verificationCode': verificationCode,
           }),
@@ -376,7 +399,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<String>);
+                as _ida.Future<String>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -384,14 +407,14 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<void> finishPasswordReset(
-    _i1.TestSessionBuilder sessionBuilder, {
+  _ida.Future<void> finishPasswordReset(
+    _ist.TestSessionBuilder sessionBuilder, {
     required String finishPasswordResetToken,
     required String newPassword,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'finishPasswordReset',
           );
@@ -400,7 +423,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'finishPasswordReset',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'finishPasswordResetToken': finishPasswordResetToken,
             'newPassword': newPassword,
           }),
@@ -411,7 +434,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -419,10 +442,10 @@ class _EmailIdpEndpoint {
     });
   }
 
-  _i3.Future<bool> hasAccount(_i1.TestSessionBuilder sessionBuilder) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+  _ida.Future<bool> hasAccount(_ist.TestSessionBuilder sessionBuilder) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'emailIdp',
             method: 'hasAccount',
           );
@@ -431,7 +454,7 @@ class _EmailIdpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'emailIdp',
           methodName: 'hasAccount',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -439,7 +462,7 @@ class _EmailIdpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<bool>);
+                as _ida.Future<bool>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -454,17 +477,17 @@ class _JwtRefreshEndpoint {
     this._serializationManager,
   );
 
-  final _i2.EndpointDispatch _endpointDispatch;
+  final _is.EndpointDispatch _endpointDispatch;
 
-  final _i2.SerializationManager _serializationManager;
+  final _is.SerializationManager _serializationManager;
 
-  _i3.Future<_i4.AuthSuccess> refreshAccessToken(
-    _i1.TestSessionBuilder sessionBuilder, {
-    required String refreshToken,
+  _ida.Future<_iacs.AuthSuccess> refreshAccessToken(
+    _ist.TestSessionBuilder sessionBuilder, {
+    String? refreshToken,
   }) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'jwtRefresh',
             method: 'refreshAccessToken',
           );
@@ -473,7 +496,7 @@ class _JwtRefreshEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'jwtRefresh',
           methodName: 'refreshAccessToken',
-          parameters: _i1.testObjectToJson({'refreshToken': refreshToken}),
+          parameters: _ist.testObjectToJson({'refreshToken': refreshToken}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -481,7 +504,7 @@ class _JwtRefreshEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i4.AuthSuccess>);
+                as _ida.Future<_iacs.AuthSuccess>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -496,17 +519,17 @@ class _AdminEndpoint {
     this._serializationManager,
   );
 
-  final _i2.EndpointDispatch _endpointDispatch;
+  final _is.EndpointDispatch _endpointDispatch;
 
-  final _i2.SerializationManager _serializationManager;
+  final _is.SerializationManager _serializationManager;
 
-  _i3.Future<_i5.Quiz> createQuiz(
-    _i1.TestSessionBuilder sessionBuilder,
-    _i5.Quiz quiz,
+  _ida.Future<_iiv8jun1.Quiz> createQuiz(
+    _ist.TestSessionBuilder sessionBuilder,
+    _iiv8jun1.Quiz quiz,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'admin',
             method: 'createQuiz',
           );
@@ -515,7 +538,7 @@ class _AdminEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'admin',
           methodName: 'createQuiz',
-          parameters: _i1.testObjectToJson({'quiz': quiz}),
+          parameters: _ist.testObjectToJson({'quiz': quiz}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -523,7 +546,7 @@ class _AdminEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i5.Quiz>);
+                as _ida.Future<_iiv8jun1.Quiz>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -531,12 +554,12 @@ class _AdminEndpoint {
     });
   }
 
-  _i3.Future<List<_i5.Quiz>> getQuizzes(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<List<_iiv8jun1.Quiz>> getQuizzes(
+    _ist.TestSessionBuilder sessionBuilder,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'admin',
             method: 'getQuizzes',
           );
@@ -545,7 +568,7 @@ class _AdminEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'admin',
           methodName: 'getQuizzes',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -553,7 +576,7 @@ class _AdminEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i5.Quiz>>);
+                as _ida.Future<List<_iiv8jun1.Quiz>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -561,13 +584,13 @@ class _AdminEndpoint {
     });
   }
 
-  _i3.Future<_i5.Quiz?> getQuiz(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<_iiv8jun1.Quiz?> getQuiz(
+    _ist.TestSessionBuilder sessionBuilder,
     int id,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'admin',
             method: 'getQuiz',
           );
@@ -576,7 +599,7 @@ class _AdminEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'admin',
           methodName: 'getQuiz',
-          parameters: _i1.testObjectToJson({'id': id}),
+          parameters: _ist.testObjectToJson({'id': id}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -584,7 +607,7 @@ class _AdminEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i5.Quiz?>);
+                as _ida.Future<_iiv8jun1.Quiz?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -592,13 +615,13 @@ class _AdminEndpoint {
     });
   }
 
-  _i3.Future<_i6.Question> addQuestion(
-    _i1.TestSessionBuilder sessionBuilder,
-    _i6.Question question,
+  _ida.Future<_iih33dk0.Question> addQuestion(
+    _ist.TestSessionBuilder sessionBuilder,
+    _iih33dk0.Question question,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'admin',
             method: 'addQuestion',
           );
@@ -607,7 +630,7 @@ class _AdminEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'admin',
           methodName: 'addQuestion',
-          parameters: _i1.testObjectToJson({'question': question}),
+          parameters: _ist.testObjectToJson({'question': question}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -615,7 +638,7 @@ class _AdminEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i6.Question>);
+                as _ida.Future<_iih33dk0.Question>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -623,13 +646,13 @@ class _AdminEndpoint {
     });
   }
 
-  _i3.Future<List<_i6.Question>> getQuestionsForQuiz(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<List<_iih33dk0.Question>> getQuestionsForQuiz(
+    _ist.TestSessionBuilder sessionBuilder,
     int quizId,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'admin',
             method: 'getQuestionsForQuiz',
           );
@@ -638,7 +661,7 @@ class _AdminEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'admin',
           methodName: 'getQuestionsForQuiz',
-          parameters: _i1.testObjectToJson({'quizId': quizId}),
+          parameters: _ist.testObjectToJson({'quizId': quizId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -646,7 +669,7 @@ class _AdminEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i6.Question>>);
+                as _ida.Future<List<_iih33dk0.Question>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -654,13 +677,13 @@ class _AdminEndpoint {
     });
   }
 
-  _i3.Future<void> deleteQuiz(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<void> deleteQuiz(
+    _ist.TestSessionBuilder sessionBuilder,
     int quizId,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'admin',
             method: 'deleteQuiz',
           );
@@ -669,7 +692,7 @@ class _AdminEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'admin',
           methodName: 'deleteQuiz',
-          parameters: _i1.testObjectToJson({'quizId': quizId}),
+          parameters: _ist.testObjectToJson({'quizId': quizId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -677,7 +700,7 @@ class _AdminEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -692,18 +715,18 @@ class _KahootEndpoint {
     this._serializationManager,
   );
 
-  final _i2.EndpointDispatch _endpointDispatch;
+  final _is.EndpointDispatch _endpointDispatch;
 
-  final _i2.SerializationManager _serializationManager;
+  final _is.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.GameSession> createGame(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<_i7mvdyd7.GameSession> createGame(
+    _ist.TestSessionBuilder sessionBuilder,
     int quizId,
     int hostId,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'createGame',
           );
@@ -712,7 +735,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'createGame',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'quizId': quizId,
             'hostId': hostId,
           }),
@@ -723,7 +746,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.GameSession>);
+                as _ida.Future<_i7mvdyd7.GameSession>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -731,13 +754,13 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<_i7.GameSession?> getGameByPin(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<_i7mvdyd7.GameSession?> getGameByPin(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'getGameByPin',
           );
@@ -746,7 +769,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'getGameByPin',
-          parameters: _i1.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({'pin': pin}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -754,7 +777,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.GameSession?>);
+                as _ida.Future<_i7mvdyd7.GameSession?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -762,16 +785,16 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Stream<_i8.GameEvent> gameStream(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Stream<_i68w0vuw.GameEvent> gameStream(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
     bool isHost,
   ) {
-    var _localTestStreamManager = _i1.TestStreamManager<_i8.GameEvent>();
-    _i1.callStreamFunctionAndHandleExceptions(
+    var _localTestStreamManager = _ist.TestStreamManager<_i68w0vuw.GameEvent>();
+    _ist.callStreamFunctionAndHandleExceptions(
       () async {
         var _localUniqueSession =
-            (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
               endpoint: 'kahoot',
               method: 'gameStream',
             );
@@ -798,15 +821,15 @@ class _KahootEndpoint {
     return _localTestStreamManager.outputStreamController.stream;
   }
 
-  _i3.Future<void> sendEvent(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<void> sendEvent(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
-    _i8.GameEvent event,
+    _i68w0vuw.GameEvent event,
     bool toHostOnly,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'sendEvent',
           );
@@ -815,7 +838,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'sendEvent',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'pin': pin,
             'event': event,
             'toHostOnly': toHostOnly,
@@ -827,7 +850,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -835,14 +858,14 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<_i9.Player?> joinGame(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<_irte7cmr.Player?> joinGame(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
     String username,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'joinGame',
           );
@@ -851,7 +874,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'joinGame',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'pin': pin,
             'username': username,
           }),
@@ -862,7 +885,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i9.Player?>);
+                as _ida.Future<_irte7cmr.Player?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -870,13 +893,13 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<void> startQuestion(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<void> startQuestion(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'startQuestion',
           );
@@ -885,7 +908,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'startQuestion',
-          parameters: _i1.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({'pin': pin}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -893,7 +916,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -901,13 +924,13 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<_i7.GameSession?> nextQuestion(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<_i7mvdyd7.GameSession?> nextQuestion(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'nextQuestion',
           );
@@ -916,7 +939,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'nextQuestion',
-          parameters: _i1.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({'pin': pin}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -924,7 +947,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.GameSession?>);
+                as _ida.Future<_i7mvdyd7.GameSession?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -932,15 +955,15 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<int> submitAnswer(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<int> submitAnswer(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
     int playerId,
     int optionIndex,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'submitAnswer',
           );
@@ -949,7 +972,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'submitAnswer',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'pin': pin,
             'playerId': playerId,
             'optionIndex': optionIndex,
@@ -961,7 +984,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<int>);
+                as _ida.Future<int>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -969,13 +992,217 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<void> endQuestion(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<bool> hasAnsweredQuestion(
+    _ist.TestSessionBuilder sessionBuilder,
+    String pin,
+    int playerId,
+    int questionIndex,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'kahoot',
+            method: 'hasAnsweredQuestion',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'kahoot',
+          methodName: 'hasAnsweredQuestion',
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'playerId': playerId,
+            'questionIndex': questionIndex,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_irte7cmr.Player?> reconnectPlayer(
+    _ist.TestSessionBuilder sessionBuilder,
+    String pin,
+    int playerId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'kahoot',
+            method: 'reconnectPlayer',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'kahoot',
+          methodName: 'reconnectPlayer',
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'playerId': playerId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_irte7cmr.Player?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_irte7cmr.Player?> getPlayer(
+    _ist.TestSessionBuilder sessionBuilder,
+    int playerId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'kahoot',
+            method: 'getPlayer',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'kahoot',
+          methodName: 'getPlayer',
+          parameters: _ist.testObjectToJson({'playerId': playerId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_irte7cmr.Player?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_irte7cmr.Player>> getPlayers(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'kahoot',
+            method: 'getPlayers',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'kahoot',
+          methodName: 'getPlayers',
+          parameters: _ist.testObjectToJson({'pin': pin}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_irte7cmr.Player>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> leaveGame(
+    _ist.TestSessionBuilder sessionBuilder,
+    String pin,
+    int playerId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'kahoot',
+            method: 'leaveGame',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'kahoot',
+          methodName: 'leaveGame',
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'playerId': playerId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> removePlayer(
+    _ist.TestSessionBuilder sessionBuilder,
+    String pin,
+    int playerId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'kahoot',
+            method: 'removePlayer',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'kahoot',
+          methodName: 'removePlayer',
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'playerId': playerId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> endQuestion(
+    _ist.TestSessionBuilder sessionBuilder,
+    String pin,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'endQuestion',
           );
@@ -984,7 +1211,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'endQuestion',
-          parameters: _i1.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({'pin': pin}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -992,7 +1219,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1000,13 +1227,13 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<void> showLeaderboard(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<void> showLeaderboard(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'showLeaderboard',
           );
@@ -1015,7 +1242,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'showLeaderboard',
-          parameters: _i1.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({'pin': pin}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1023,7 +1250,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1031,13 +1258,13 @@ class _KahootEndpoint {
     });
   }
 
-  _i3.Future<void> finishGame(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<void> finishGame(
+    _ist.TestSessionBuilder sessionBuilder,
     String pin,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
             method: 'finishGame',
           );
@@ -1046,7 +1273,7 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'finishGame',
-          parameters: _i1.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({'pin': pin}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1054,7 +1281,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

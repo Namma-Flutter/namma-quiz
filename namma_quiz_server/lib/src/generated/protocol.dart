@@ -8,106 +8,140 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
-import 'package:serverpod/protocol.dart' as _i2;
-import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i3;
+import 'package:namma_kahoot_server/src/generated/kahoot/player.dart'
+    as _irte7cmr;
+import 'package:namma_kahoot_server/src/generated/kahoot/question.dart'
+    as _iih33dk0;
+import 'package:namma_kahoot_server/src/generated/kahoot/quiz.dart'
+    as _iiv8jun1;
+import 'package:serverpod/protocol.dart' as _isp;
+import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i4;
-import 'kahoot/game_event.dart' as _i5;
-import 'kahoot/game_session.dart' as _i6;
-import 'kahoot/player.dart' as _i7;
-import 'kahoot/question.dart' as _i8;
-import 'kahoot/quiz.dart' as _i9;
-import 'package:namma_kahoot_server/src/generated/kahoot/quiz.dart' as _i10;
-import 'package:namma_kahoot_server/src/generated/kahoot/question.dart' as _i11;
+    as _iacs;
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+    as _iais;
+import 'kahoot/game_event.dart' as _id6llbty;
+import 'kahoot/game_session.dart' as _iaqji94d;
+import 'kahoot/player.dart' as _ivk98tqa;
+import 'kahoot/question.dart' as _ix1hu9i6;
+import 'kahoot/quiz.dart' as _isre1cxb;
 export 'kahoot/game_event.dart';
 export 'kahoot/game_session.dart';
 export 'kahoot/player.dart';
 export 'kahoot/question.dart';
 export 'kahoot/quiz.dart';
 
-class Protocol extends _i1.SerializationManagerServer {
+class Protocol extends _is.DatabaseSerializationManager
+    implements _is.DatabaseProtocolDeserializationProvider {
   Protocol._();
 
   factory Protocol() => _instance;
 
-  static final Protocol _instance = Protocol._();
+  static final Protocol _instance = Protocol._().._registerHostProtocols();
 
-  static final List<_i2.TableDefinition> targetTableDefinitions = [
-    _i2.TableDefinition(
+  @override
+  _is.ProtocolDeserialization get deserializationMetadata =>
+      _is.ProtocolDeserialization.cached(
+        this,
+        types: const [
+          _is.getType<_id6llbty.GameEvent>,
+          _is.getType<_iaqji94d.GameSession>,
+          _is.getType<_ivk98tqa.Player>,
+          _is.getType<_ix1hu9i6.Question>,
+          _is.getType<_isre1cxb.Quiz>,
+          _is.getType<_id6llbty.GameEvent?>,
+          _is.getType<_iaqji94d.GameSession?>,
+          _is.getType<_ivk98tqa.Player?>,
+          _is.getType<_ix1hu9i6.Question?>,
+          _is.getType<_isre1cxb.Quiz?>,
+          _is.getType<List<String>>,
+          _is.getType<List<_iiv8jun1.Quiz>>,
+          _is.getType<List<_iih33dk0.Question>>,
+          _is.getType<List<_irte7cmr.Player>>,
+        ],
+        modules: const [
+          _iais.Protocol.new,
+          _iacs.Protocol.new,
+          _isp.Protocol.new,
+        ],
+        classNames: const [
+          'GameEvent',
+          'GameSession',
+          'Player',
+          'Question',
+          'Quiz',
+        ],
+      );
+
+  static List<_isp.TableDefinition> get targetTableDefinitions => [
+    ..._ownTableDefinitions,
+    ..._iais.Protocol().getOwnTableDefinitions(),
+    ..._iacs.Protocol().getOwnTableDefinitions(),
+    ..._isp.Protocol.targetTableDefinitions,
+  ];
+
+  static List<_isp.TableDefinition> get _ownTableDefinitions => [
+    _isp.TableDefinition(
       name: 'game_sessions',
       dartName: 'GameSession',
       schema: 'public',
       module: 'namma_kahoot',
       columns: [
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'game_sessions_id_seq\'::regclass)',
+          columnDefault: 'serial',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'pin',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'quizId',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'hostId',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'status',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'currentQuestionIndex',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'startTime',
-          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: true,
           dartType: 'DateTime?',
         ),
       ],
       foreignKeys: [],
       indexes: [
-        _i2.IndexDefinition(
-          indexName: 'game_sessions_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            ),
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'game_session_pin_idx',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'pin',
             ),
           ],
@@ -118,59 +152,46 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
-    _i2.TableDefinition(
+    _isp.TableDefinition(
       name: 'players',
       dartName: 'Player',
       schema: 'public',
       module: 'namma_kahoot',
       columns: [
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'players_id_seq\'::regclass)',
+          columnDefault: 'serial',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'gameSessionId',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'name',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'score',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
       ],
       foreignKeys: [],
       indexes: [
-        _i2.IndexDefinition(
-          indexName: 'players_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            ),
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'player_game_session_idx',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'gameSessionId',
             ),
           ],
@@ -181,77 +202,64 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
-    _i2.TableDefinition(
+    _isp.TableDefinition(
       name: 'questions',
       dartName: 'Question',
       schema: 'public',
       module: 'namma_kahoot',
       columns: [
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'questions_id_seq\'::regclass)',
+          columnDefault: 'serial',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'quizId',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'text',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'options',
-          columnType: _i2.ColumnType.json,
+          columnType: _isp.ColumnType.json,
           isNullable: false,
           dartType: 'List<String>',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'correctOptionIndex',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'timeLimitSeconds',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'orderIndex',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
       ],
       foreignKeys: [],
       indexes: [
-        _i2.IndexDefinition(
-          indexName: 'questions_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            ),
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'question_quiz_idx',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'quizId',
             ),
           ],
@@ -262,65 +270,52 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
-    _i2.TableDefinition(
+    _isp.TableDefinition(
       name: 'quizzes',
       dartName: 'Quiz',
       schema: 'public',
       module: 'namma_kahoot',
       columns: [
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'quizzes_id_seq\'::regclass)',
+          columnDefault: 'serial',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'title',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'creatorId',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'description',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: true,
           dartType: 'String?',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'createdAt',
-          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
         ),
       ],
       foreignKeys: [],
       indexes: [
-        _i2.IndexDefinition(
-          indexName: 'quizzes_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            ),
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'quiz_creator_idx',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'creatorId',
             ),
           ],
@@ -331,16 +326,10 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
-    ..._i3.Protocol.targetTableDefinitions,
-    ..._i4.Protocol.targetTableDefinitions,
-    ..._i2.Protocol.targetTableDefinitions,
   ];
 
-  static String? getClassNameFromObjectJson(dynamic data) {
-    if (data is! Map) return null;
-    final className = data['__className__'] as String?;
-    return className;
-  }
+  static String? getClassNameFromObjectJson(dynamic data) =>
+      _is.ProtocolDeserialization.readClassName(data);
 
   @override
   T deserialize<T>(
@@ -348,80 +337,90 @@ class Protocol extends _i1.SerializationManagerServer {
     Type? t,
   ]) {
     t ??= T;
-
-    final dataClassName = getClassNameFromObjectJson(data);
+    final rawDataClassName = _is.ProtocolDeserialization.readClassName(data);
+    final dataClassName = rawDataClassName;
     if (dataClassName != null && dataClassName != getClassNameForType(t)) {
       try {
         return deserializeByClassName({
           'className': dataClassName,
           'data': data,
         });
-      } on FormatException catch (_) {
+      } on _is.DeserializationClassNameNotFoundException catch (_) {
         // If the className is not recognized (e.g., older client receiving
         // data with a new subtype), fall back to deserializing without the
         // className, using the expected type T.
       }
     }
 
-    if (t == _i5.GameEvent) {
-      return _i5.GameEvent.fromJson(data) as T;
+    if (t == _id6llbty.GameEvent) {
+      return _id6llbty.GameEvent.fromJson(data) as T;
     }
-    if (t == _i6.GameSession) {
-      return _i6.GameSession.fromJson(data) as T;
+    if (t == _iaqji94d.GameSession) {
+      return _iaqji94d.GameSession.fromJson(data) as T;
     }
-    if (t == _i7.Player) {
-      return _i7.Player.fromJson(data) as T;
+    if (t == _ivk98tqa.Player) {
+      return _ivk98tqa.Player.fromJson(data) as T;
     }
-    if (t == _i8.Question) {
-      return _i8.Question.fromJson(data) as T;
+    if (t == _ix1hu9i6.Question) {
+      return _ix1hu9i6.Question.fromJson(data) as T;
     }
-    if (t == _i9.Quiz) {
-      return _i9.Quiz.fromJson(data) as T;
+    if (t == _isre1cxb.Quiz) {
+      return _isre1cxb.Quiz.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i5.GameEvent?>()) {
-      return (data != null ? _i5.GameEvent.fromJson(data) : null) as T;
+    if (t == _is.getType<_id6llbty.GameEvent?>()) {
+      return (data != null ? _id6llbty.GameEvent.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.GameSession?>()) {
-      return (data != null ? _i6.GameSession.fromJson(data) : null) as T;
+    if (t == _is.getType<_iaqji94d.GameSession?>()) {
+      return (data != null ? _iaqji94d.GameSession.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.Player?>()) {
-      return (data != null ? _i7.Player.fromJson(data) : null) as T;
+    if (t == _is.getType<_ivk98tqa.Player?>()) {
+      return (data != null ? _ivk98tqa.Player.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.Question?>()) {
-      return (data != null ? _i8.Question.fromJson(data) : null) as T;
+    if (t == _is.getType<_ix1hu9i6.Question?>()) {
+      return (data != null ? _ix1hu9i6.Question.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.Quiz?>()) {
-      return (data != null ? _i9.Quiz.fromJson(data) : null) as T;
+    if (t == _is.getType<_isre1cxb.Quiz?>()) {
+      return (data != null ? _isre1cxb.Quiz.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i10.Quiz>) {
-      return (data as List).map((e) => deserialize<_i10.Quiz>(e)).toList() as T;
-    }
-    if (t == List<_i11.Question>) {
-      return (data as List).map((e) => deserialize<_i11.Question>(e)).toList()
+    if (t == List<_iiv8jun1.Quiz>) {
+      return (data as List).map((e) => deserialize<_iiv8jun1.Quiz>(e)).toList()
           as T;
     }
-    try {
-      return _i3.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
-    try {
-      return _i4.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
-    try {
-      return _i2.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
+    if (t == List<_iih33dk0.Question>) {
+      return (data as List)
+              .map((e) => deserialize<_iih33dk0.Question>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_irte7cmr.Player>) {
+      return (data as List)
+              .map((e) => deserialize<_irte7cmr.Player>(e))
+              .toList()
+          as T;
+    }
+    final modules = deserializationMetadata.modulesForDeserialization(
+      t,
+      className: rawDataClassName,
+    );
+    for (final module in modules) {
+      try {
+        return module.deserialize<T>(data, t);
+      } on _is.DeserializationTypeNotFoundException catch (_) {}
+    }
+
     return super.deserialize<T>(data, t);
   }
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i5.GameEvent => 'GameEvent',
-      _i6.GameSession => 'GameSession',
-      _i7.Player => 'Player',
-      _i8.Question => 'Question',
-      _i9.Quiz => 'Quiz',
+      _id6llbty.GameEvent => 'GameEvent',
+      _iaqji94d.GameSession => 'GameSession',
+      _ivk98tqa.Player => 'Player',
+      _ix1hu9i6.Question => 'Question',
+      _isre1cxb.Quiz => 'Quiz',
       _ => null,
     };
   }
@@ -439,28 +438,32 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i5.GameEvent():
+      case _id6llbty.GameEvent():
         return 'GameEvent';
-      case _i6.GameSession():
+      case _iaqji94d.GameSession():
         return 'GameSession';
-      case _i7.Player():
+      case _ivk98tqa.Player():
         return 'Player';
-      case _i8.Question():
+      case _ix1hu9i6.Question():
         return 'Question';
-      case _i9.Quiz():
+      case _isre1cxb.Quiz():
         return 'Quiz';
     }
-    className = _i2.Protocol().getClassNameForObject(data);
+    className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod.$className';
+      return className.contains('.')
+          ? className
+          : 'serverpod_auth_idp.$className';
     }
-    className = _i3.Protocol().getClassNameForObject(data);
+    className = _iacs.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod_auth_idp.$className';
+      return className.contains('.')
+          ? className
+          : 'serverpod_auth_core.$className';
     }
-    className = _i4.Protocol().getClassNameForObject(data);
+    className = _isp.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod_auth_core.$className';
+      return className.contains('.') ? className : 'serverpod.$className';
     }
     return null;
   }
@@ -472,71 +475,85 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'GameEvent') {
-      return deserialize<_i5.GameEvent>(data['data']);
+      return deserialize<_id6llbty.GameEvent>(data['data']);
     }
     if (dataClassName == 'GameSession') {
-      return deserialize<_i6.GameSession>(data['data']);
+      return deserialize<_iaqji94d.GameSession>(data['data']);
     }
     if (dataClassName == 'Player') {
-      return deserialize<_i7.Player>(data['data']);
+      return deserialize<_ivk98tqa.Player>(data['data']);
     }
     if (dataClassName == 'Question') {
-      return deserialize<_i8.Question>(data['data']);
+      return deserialize<_ix1hu9i6.Question>(data['data']);
     }
     if (dataClassName == 'Quiz') {
-      return deserialize<_i9.Quiz>(data['data']);
-    }
-    if (dataClassName.startsWith('serverpod.')) {
-      data['className'] = dataClassName.substring(10);
-      return _i2.Protocol().deserializeByClassName(data);
+      return deserialize<_isre1cxb.Quiz>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
-      data['className'] = dataClassName.substring(19);
-      return _i3.Protocol().deserializeByClassName(data);
+      return _iais.Protocol().deserializeByClassName({
+        ...data,
+        'className': dataClassName.substring(19),
+      });
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
-      data['className'] = dataClassName.substring(20);
-      return _i4.Protocol().deserializeByClassName(data);
+      return _iacs.Protocol().deserializeByClassName({
+        ...data,
+        'className': dataClassName.substring(20),
+      });
+    }
+    if (dataClassName.startsWith('serverpod.')) {
+      return _isp.Protocol().deserializeByClassName({
+        ...data,
+        'className': dataClassName.substring(10),
+      });
     }
     return super.deserializeByClassName(data);
   }
 
+  void _registerHostProtocols() {
+    _iais.Protocol().registerHostProtocol('namma_kahoot', this);
+    _iacs.Protocol().registerHostProtocol('namma_kahoot', this);
+  }
+
   @override
-  _i1.Table? getTableForType(Type t) {
+  _is.Table? getTableForType(Type t) {
     {
-      var table = _i3.Protocol().getTableForType(t);
+      var table = _iais.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     {
-      var table = _i4.Protocol().getTableForType(t);
+      var table = _iacs.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     {
-      var table = _i2.Protocol().getTableForType(t);
+      var table = _isp.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     switch (t) {
-      case _i6.GameSession:
-        return _i6.GameSession.t;
-      case _i7.Player:
-        return _i7.Player.t;
-      case _i8.Question:
-        return _i8.Question.t;
-      case _i9.Quiz:
-        return _i9.Quiz.t;
+      case _iaqji94d.GameSession:
+        return _iaqji94d.GameSession.t;
+      case _ivk98tqa.Player:
+        return _ivk98tqa.Player.t;
+      case _ix1hu9i6.Question:
+        return _ix1hu9i6.Question.t;
+      case _isre1cxb.Quiz:
+        return _isre1cxb.Quiz.t;
     }
     return null;
   }
 
   @override
-  List<_i2.TableDefinition> getTargetTableDefinitions() =>
+  List<_isp.TableDefinition> getTargetTableDefinitions() =>
       targetTableDefinitions;
+
+  @override
+  List<_isp.TableDefinition> getOwnTableDefinitions() => _ownTableDefinitions;
 
   @override
   String getModuleName() => 'namma_kahoot';
@@ -551,10 +568,10 @@ class Protocol extends _i1.SerializationManagerServer {
       return null;
     }
     try {
-      return _i3.Protocol().mapRecordToJson(record);
+      return _iais.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
-      return _i4.Protocol().mapRecordToJson(record);
+      return _iacs.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

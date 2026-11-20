@@ -8,20 +8,24 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'kahoot/game_event.dart' as _i2;
-import 'kahoot/game_session.dart' as _i3;
-import 'kahoot/player.dart' as _i4;
-import 'kahoot/question.dart' as _i5;
-import 'kahoot/quiz.dart' as _i6;
-import 'package:namma_kahoot_client/src/protocol/kahoot/quiz.dart' as _i7;
-import 'package:namma_kahoot_client/src/protocol/kahoot/question.dart' as _i8;
-import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
-    as _i9;
+import 'package:namma_kahoot_client/src/protocol/kahoot/player.dart'
+    as _iowcd9iw;
+import 'package:namma_kahoot_client/src/protocol/kahoot/question.dart'
+    as _imhbbxog;
+import 'package:namma_kahoot_client/src/protocol/kahoot/quiz.dart' as _ibf9eeue;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
-    as _i10;
+    as _iacc;
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+    as _iaic;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'kahoot/game_event.dart' as _id6llbty;
+import 'kahoot/game_session.dart' as _iaqji94d;
+import 'kahoot/player.dart' as _ivk98tqa;
+import 'kahoot/question.dart' as _ix1hu9i6;
+import 'kahoot/quiz.dart' as _isre1cxb;
 export 'kahoot/game_event.dart';
 export 'kahoot/game_session.dart';
 export 'kahoot/player.dart';
@@ -29,18 +33,49 @@ export 'kahoot/question.dart';
 export 'kahoot/quiz.dart';
 export 'client.dart';
 
-class Protocol extends _i1.SerializationManager {
+class Protocol extends _isc.SerializationManager
+    implements _isc.ProtocolDeserializationProvider {
   Protocol._();
 
   factory Protocol() => _instance;
 
-  static final Protocol _instance = Protocol._();
+  static final Protocol _instance = Protocol._().._registerHostProtocols();
 
-  static String? getClassNameFromObjectJson(dynamic data) {
-    if (data is! Map) return null;
-    final className = data['__className__'] as String?;
-    return className;
-  }
+  @override
+  _isc.ProtocolDeserialization get deserializationMetadata =>
+      _isc.ProtocolDeserialization.cached(
+        this,
+        types: const [
+          _isc.getType<_id6llbty.GameEvent>,
+          _isc.getType<_iaqji94d.GameSession>,
+          _isc.getType<_ivk98tqa.Player>,
+          _isc.getType<_ix1hu9i6.Question>,
+          _isc.getType<_isre1cxb.Quiz>,
+          _isc.getType<_id6llbty.GameEvent?>,
+          _isc.getType<_iaqji94d.GameSession?>,
+          _isc.getType<_ivk98tqa.Player?>,
+          _isc.getType<_ix1hu9i6.Question?>,
+          _isc.getType<_isre1cxb.Quiz?>,
+          _isc.getType<List<String>>,
+          _isc.getType<List<_ibf9eeue.Quiz>>,
+          _isc.getType<List<_imhbbxog.Question>>,
+          _isc.getType<List<_iowcd9iw.Player>>,
+        ],
+        modules: const [
+          _iaic.Protocol.new,
+          _iacc.Protocol.new,
+        ],
+        classNames: const [
+          'GameEvent',
+          'GameSession',
+          'Player',
+          'Question',
+          'Quiz',
+        ],
+      );
+
+  static String? getClassNameFromObjectJson(dynamic data) =>
+      _isc.ProtocolDeserialization.readClassName(data);
 
   @override
   T deserialize<T>(
@@ -48,77 +83,90 @@ class Protocol extends _i1.SerializationManager {
     Type? t,
   ]) {
     t ??= T;
-
-    final dataClassName = getClassNameFromObjectJson(data);
+    final rawDataClassName = _isc.ProtocolDeserialization.readClassName(data);
+    final dataClassName = rawDataClassName;
     if (dataClassName != null && dataClassName != getClassNameForType(t)) {
       try {
         return deserializeByClassName({
           'className': dataClassName,
           'data': data,
         });
-      } on FormatException catch (_) {
+      } on _isc.DeserializationClassNameNotFoundException catch (_) {
         // If the className is not recognized (e.g., older client receiving
         // data with a new subtype), fall back to deserializing without the
         // className, using the expected type T.
       }
     }
 
-    if (t == _i2.GameEvent) {
-      return _i2.GameEvent.fromJson(data) as T;
+    if (t == _id6llbty.GameEvent) {
+      return _id6llbty.GameEvent.fromJson(data) as T;
     }
-    if (t == _i3.GameSession) {
-      return _i3.GameSession.fromJson(data) as T;
+    if (t == _iaqji94d.GameSession) {
+      return _iaqji94d.GameSession.fromJson(data) as T;
     }
-    if (t == _i4.Player) {
-      return _i4.Player.fromJson(data) as T;
+    if (t == _ivk98tqa.Player) {
+      return _ivk98tqa.Player.fromJson(data) as T;
     }
-    if (t == _i5.Question) {
-      return _i5.Question.fromJson(data) as T;
+    if (t == _ix1hu9i6.Question) {
+      return _ix1hu9i6.Question.fromJson(data) as T;
     }
-    if (t == _i6.Quiz) {
-      return _i6.Quiz.fromJson(data) as T;
+    if (t == _isre1cxb.Quiz) {
+      return _isre1cxb.Quiz.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i2.GameEvent?>()) {
-      return (data != null ? _i2.GameEvent.fromJson(data) : null) as T;
+    if (t == _isc.getType<_id6llbty.GameEvent?>()) {
+      return (data != null ? _id6llbty.GameEvent.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i3.GameSession?>()) {
-      return (data != null ? _i3.GameSession.fromJson(data) : null) as T;
+    if (t == _isc.getType<_iaqji94d.GameSession?>()) {
+      return (data != null ? _iaqji94d.GameSession.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i4.Player?>()) {
-      return (data != null ? _i4.Player.fromJson(data) : null) as T;
+    if (t == _isc.getType<_ivk98tqa.Player?>()) {
+      return (data != null ? _ivk98tqa.Player.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.Question?>()) {
-      return (data != null ? _i5.Question.fromJson(data) : null) as T;
+    if (t == _isc.getType<_ix1hu9i6.Question?>()) {
+      return (data != null ? _ix1hu9i6.Question.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.Quiz?>()) {
-      return (data != null ? _i6.Quiz.fromJson(data) : null) as T;
+    if (t == _isc.getType<_isre1cxb.Quiz?>()) {
+      return (data != null ? _isre1cxb.Quiz.fromJson(data) : null) as T;
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
-    if (t == List<_i7.Quiz>) {
-      return (data as List).map((e) => deserialize<_i7.Quiz>(e)).toList() as T;
-    }
-    if (t == List<_i8.Question>) {
-      return (data as List).map((e) => deserialize<_i8.Question>(e)).toList()
+    if (t == List<_ibf9eeue.Quiz>) {
+      return (data as List).map((e) => deserialize<_ibf9eeue.Quiz>(e)).toList()
           as T;
     }
-    try {
-      return _i9.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
-    try {
-      return _i10.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
+    if (t == List<_imhbbxog.Question>) {
+      return (data as List)
+              .map((e) => deserialize<_imhbbxog.Question>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iowcd9iw.Player>) {
+      return (data as List)
+              .map((e) => deserialize<_iowcd9iw.Player>(e))
+              .toList()
+          as T;
+    }
+    final modules = deserializationMetadata.modulesForDeserialization(
+      t,
+      className: rawDataClassName,
+    );
+    for (final module in modules) {
+      try {
+        return module.deserialize<T>(data, t);
+      } on _isc.DeserializationTypeNotFoundException catch (_) {}
+    }
+
     return super.deserialize<T>(data, t);
   }
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i2.GameEvent => 'GameEvent',
-      _i3.GameSession => 'GameSession',
-      _i4.Player => 'Player',
-      _i5.Question => 'Question',
-      _i6.Quiz => 'Quiz',
+      _id6llbty.GameEvent => 'GameEvent',
+      _iaqji94d.GameSession => 'GameSession',
+      _ivk98tqa.Player => 'Player',
+      _ix1hu9i6.Question => 'Question',
+      _isre1cxb.Quiz => 'Quiz',
       _ => null,
     };
   }
@@ -136,24 +184,28 @@ class Protocol extends _i1.SerializationManager {
     }
 
     switch (data) {
-      case _i2.GameEvent():
+      case _id6llbty.GameEvent():
         return 'GameEvent';
-      case _i3.GameSession():
+      case _iaqji94d.GameSession():
         return 'GameSession';
-      case _i4.Player():
+      case _ivk98tqa.Player():
         return 'Player';
-      case _i5.Question():
+      case _ix1hu9i6.Question():
         return 'Question';
-      case _i6.Quiz():
+      case _isre1cxb.Quiz():
         return 'Quiz';
     }
-    className = _i9.Protocol().getClassNameForObject(data);
+    className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod_auth_idp.$className';
+      return className.contains('.')
+          ? className
+          : 'serverpod_auth_idp.$className';
     }
-    className = _i10.Protocol().getClassNameForObject(data);
+    className = _iacc.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod_auth_core.$className';
+      return className.contains('.')
+          ? className
+          : 'serverpod_auth_core.$className';
     }
     return null;
   }
@@ -165,30 +217,42 @@ class Protocol extends _i1.SerializationManager {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'GameEvent') {
-      return deserialize<_i2.GameEvent>(data['data']);
+      return deserialize<_id6llbty.GameEvent>(data['data']);
     }
     if (dataClassName == 'GameSession') {
-      return deserialize<_i3.GameSession>(data['data']);
+      return deserialize<_iaqji94d.GameSession>(data['data']);
     }
     if (dataClassName == 'Player') {
-      return deserialize<_i4.Player>(data['data']);
+      return deserialize<_ivk98tqa.Player>(data['data']);
     }
     if (dataClassName == 'Question') {
-      return deserialize<_i5.Question>(data['data']);
+      return deserialize<_ix1hu9i6.Question>(data['data']);
     }
     if (dataClassName == 'Quiz') {
-      return deserialize<_i6.Quiz>(data['data']);
+      return deserialize<_isre1cxb.Quiz>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
-      data['className'] = dataClassName.substring(19);
-      return _i9.Protocol().deserializeByClassName(data);
+      return _iaic.Protocol().deserializeByClassName({
+        ...data,
+        'className': dataClassName.substring(19),
+      });
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
-      data['className'] = dataClassName.substring(20);
-      return _i10.Protocol().deserializeByClassName(data);
+      return _iacc.Protocol().deserializeByClassName({
+        ...data,
+        'className': dataClassName.substring(20),
+      });
     }
     return super.deserializeByClassName(data);
   }
+
+  void _registerHostProtocols() {
+    _iaic.Protocol().registerHostProtocol('namma_kahoot', this);
+    _iacc.Protocol().registerHostProtocol('namma_kahoot', this);
+  }
+
+  @override
+  String getModuleName() => 'namma_kahoot';
 
   /// Maps any `Record`s known to this [Protocol] to their JSON representation
   ///
@@ -200,10 +264,10 @@ class Protocol extends _i1.SerializationManager {
       return null;
     }
     try {
-      return _i9.Protocol().mapRecordToJson(record);
+      return _iaic.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
-      return _i10.Protocol().mapRecordToJson(record);
+      return _iacc.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

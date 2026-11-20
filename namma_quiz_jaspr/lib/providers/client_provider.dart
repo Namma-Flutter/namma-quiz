@@ -1,8 +1,25 @@
+import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
-import '../../../namma_quiz_client/lib/namma_kahoot_client.dart';
+import 'package:namma_kahoot_client/namma_kahoot_client.dart';
+import 'package:universal_web/web.dart' as web;
 
-// Since this is purely a client-side SPA in Jaspr, we connect to the local server
-final client = Client('http://localhost:8080/');
+String _determineServerUrl() {
+  const envUrl = String.fromEnvironment('SERVER_URL');
+  if (envUrl.isNotEmpty) {
+    return envUrl;
+  }
+  if (kIsWeb) {
+    final host = web.window.location.host;
+    if (host.contains('serverpod.space')) {
+      return 'https://namma-quiz.api.serverpod.space/';
+    }
+  }
+  return 'http://localhost:8080/';
+}
+
+final serverUrl = _determineServerUrl();
+
+final client = Client(serverUrl);
 
 final clientProvider = Provider<Client>((ref) {
   return client;

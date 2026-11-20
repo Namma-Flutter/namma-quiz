@@ -10,9 +10,10 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-abstract class GameSession implements _i1.SerializableModel {
+abstract class GameSession
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   GameSession._({
     this.id,
     required this.pin,
@@ -43,7 +44,7 @@ abstract class GameSession implements _i1.SerializableModel {
       currentQuestionIndex: jsonSerialization['currentQuestionIndex'] as int,
       startTime: jsonSerialization['startTime'] == null
           ? null
-          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['startTime']),
+          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['startTime']),
     );
   }
 
@@ -66,7 +67,7 @@ abstract class GameSession implements _i1.SerializableModel {
 
   /// Returns a shallow copy of this [GameSession]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   GameSession copyWith({
     int? id,
     String? pin,
@@ -74,7 +75,7 @@ abstract class GameSession implements _i1.SerializableModel {
     int? hostId,
     String? status,
     int? currentQuestionIndex,
-    DateTime? startTime,
+    DateTime? startTime = const _isc.$UndefinedDateTime(),
   });
   @override
   Map<String, dynamic> toJson() {
@@ -91,8 +92,22 @@ abstract class GameSession implements _i1.SerializableModel {
   }
 
   @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      '__className__': 'GameSession',
+      if (id != null) 'id': id,
+      'pin': pin,
+      'quizId': quizId,
+      'hostId': hostId,
+      'status': status,
+      'currentQuestionIndex': currentQuestionIndex,
+      if (startTime != null) 'startTime': startTime?.toJson(),
+    };
+  }
+
+  @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -119,7 +134,7 @@ class _GameSessionImpl extends GameSession {
 
   /// Returns a shallow copy of this [GameSession]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   GameSession copyWith({
     Object? id = _Undefined,
@@ -128,7 +143,7 @@ class _GameSessionImpl extends GameSession {
     int? hostId,
     String? status,
     int? currentQuestionIndex,
-    Object? startTime = _Undefined,
+    DateTime? startTime = const _isc.$UndefinedDateTime(),
   }) {
     return GameSession(
       id: id is int? ? id : this.id,
@@ -137,7 +152,9 @@ class _GameSessionImpl extends GameSession {
       hostId: hostId ?? this.hostId,
       status: status ?? this.status,
       currentQuestionIndex: currentQuestionIndex ?? this.currentQuestionIndex,
-      startTime: startTime is DateTime? ? startTime : this.startTime,
+      startTime: startTime is _isc.UndefinedSentinel
+          ? this.startTime
+          : startTime,
     );
   }
 }

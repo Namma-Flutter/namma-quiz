@@ -10,9 +10,10 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-abstract class Quiz implements _i1.SerializableModel {
+abstract class Quiz
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   Quiz._({
     this.id,
     required this.title,
@@ -35,7 +36,7 @@ abstract class Quiz implements _i1.SerializableModel {
       title: jsonSerialization['title'] as String,
       creatorId: jsonSerialization['creatorId'] as int,
       description: jsonSerialization['description'] as String?,
-      createdAt: _i1.DateTimeJsonExtension.fromJson(
+      createdAt: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['createdAt'],
       ),
     );
@@ -56,7 +57,7 @@ abstract class Quiz implements _i1.SerializableModel {
 
   /// Returns a shallow copy of this [Quiz]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   Quiz copyWith({
     int? id,
     String? title,
@@ -77,8 +78,20 @@ abstract class Quiz implements _i1.SerializableModel {
   }
 
   @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      '__className__': 'Quiz',
+      if (id != null) 'id': id,
+      'title': title,
+      'creatorId': creatorId,
+      if (description != null) 'description': description,
+      'createdAt': createdAt.toJson(),
+    };
+  }
+
+  @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -101,7 +114,7 @@ class _QuizImpl extends Quiz {
 
   /// Returns a shallow copy of this [Quiz]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   Quiz copyWith({
     Object? id = _Undefined,

@@ -10,10 +10,11 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'package:namma_kahoot_client/src/protocol/protocol.dart' as _i2;
+import 'package:namma_kahoot_client/src/protocol/protocol.dart' as _iuu7jhyy;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-abstract class Question implements _i1.SerializableModel {
+abstract class Question
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   Question._({
     this.id,
     required this.quizId,
@@ -39,7 +40,7 @@ abstract class Question implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       quizId: jsonSerialization['quizId'] as int,
       text: jsonSerialization['text'] as String,
-      options: _i2.Protocol().deserialize<List<String>>(
+      options: _iuu7jhyy.Protocol().deserialize<List<String>>(
         jsonSerialization['options'],
       ),
       correctOptionIndex: jsonSerialization['correctOptionIndex'] as int,
@@ -67,7 +68,7 @@ abstract class Question implements _i1.SerializableModel {
 
   /// Returns a shallow copy of this [Question]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   Question copyWith({
     int? id,
     int? quizId,
@@ -92,8 +93,22 @@ abstract class Question implements _i1.SerializableModel {
   }
 
   @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      '__className__': 'Question',
+      if (id != null) 'id': id,
+      'quizId': quizId,
+      'text': text,
+      'options': options.toJson(),
+      'correctOptionIndex': correctOptionIndex,
+      'timeLimitSeconds': timeLimitSeconds,
+      'orderIndex': orderIndex,
+    };
+  }
+
+  @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -120,7 +135,7 @@ class _QuestionImpl extends Question {
 
   /// Returns a shallow copy of this [Question]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   Question copyWith({
     Object? id = _Undefined,

@@ -10,26 +10,30 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
-    as _i1;
-import 'package:serverpod_client/serverpod_client.dart' as _i2;
-import 'dart:async' as _i3;
-import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
-    as _i4;
-import 'package:namma_kahoot_client/src/protocol/kahoot/quiz.dart' as _i5;
-import 'package:namma_kahoot_client/src/protocol/kahoot/question.dart' as _i6;
+import 'dart:async' as _ida;
+import 'package:http/http.dart' as _i85jenna;
+import 'package:namma_kahoot_client/src/protocol/kahoot/game_event.dart'
+    as _i43ngwq2;
 import 'package:namma_kahoot_client/src/protocol/kahoot/game_session.dart'
-    as _i7;
-import 'package:namma_kahoot_client/src/protocol/kahoot/game_event.dart' as _i8;
-import 'package:namma_kahoot_client/src/protocol/kahoot/player.dart' as _i9;
-import 'protocol.dart' as _i10;
+    as _i5juiv7o;
+import 'package:namma_kahoot_client/src/protocol/kahoot/player.dart'
+    as _iowcd9iw;
+import 'package:namma_kahoot_client/src/protocol/kahoot/question.dart'
+    as _imhbbxog;
+import 'package:namma_kahoot_client/src/protocol/kahoot/quiz.dart' as _ibf9eeue;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+    as _iacc;
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+    as _iaic;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'protocol.dart' as _il2as5qe;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
 /// on the client.
 /// {@category Endpoint}
-class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
-  EndpointEmailIdp(_i2.EndpointCaller caller) : super(caller);
+class EndpointEmailIdp extends _iaic.EndpointEmailIdpBase {
+  EndpointEmailIdp(_isc.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'emailIdp';
@@ -44,10 +48,10 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///
   /// Throws an [AuthUserBlockedException] if the auth user is blocked.
   @override
-  _i3.Future<_i4.AuthSuccess> login({
+  _ida.Future<_iacc.AuthSuccess> login({
     required String email,
     required String password,
-  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+  }) => caller.callServerEndpoint<_iacc.AuthSuccess>(
     'emailIdp',
     'login',
     {
@@ -67,8 +71,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// registration. If the email is already registered, the returned ID will not
   /// be valid.
   @override
-  _i3.Future<_i2.UuidValue> startRegistration({required String email}) =>
-      caller.callServerEndpoint<_i2.UuidValue>(
+  _ida.Future<_isc.UuidValue> startRegistration({required String email}) =>
+      caller.callServerEndpoint<_isc.UuidValue>(
         'emailIdp',
         'startRegistration',
         {'email': email},
@@ -85,8 +89,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// - [EmailAccountRequestExceptionReason.invalid] if no request exists
   ///   for the given [accountRequestId] or [verificationCode] is invalid.
   @override
-  _i3.Future<String> verifyRegistrationCode({
-    required _i2.UuidValue accountRequestId,
+  _ida.Future<String> verifyRegistrationCode({
+    required _isc.UuidValue accountRequestId,
     required String verificationCode,
   }) => caller.callServerEndpoint<String>(
     'emailIdp',
@@ -112,10 +116,10 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///
   /// Returns a session for the newly created user.
   @override
-  _i3.Future<_i4.AuthSuccess> finishRegistration({
+  _ida.Future<_iacc.AuthSuccess> finishRegistration({
     required String registrationToken,
     required String password,
-  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
+  }) => caller.callServerEndpoint<_iacc.AuthSuccess>(
     'emailIdp',
     'finishRegistration',
     {
@@ -138,8 +142,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///   made too many attempts trying to request a password reset.
   ///
   @override
-  _i3.Future<_i2.UuidValue> startPasswordReset({required String email}) =>
-      caller.callServerEndpoint<_i2.UuidValue>(
+  _ida.Future<_isc.UuidValue> startPasswordReset({required String email}) =>
+      caller.callServerEndpoint<_isc.UuidValue>(
         'emailIdp',
         'startPasswordReset',
         {'email': email},
@@ -160,8 +164,8 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   /// should be overridden to return credentials for the next step instead
   /// of the credentials for setting the password.
   @override
-  _i3.Future<String> verifyPasswordResetCode({
-    required _i2.UuidValue passwordResetRequestId,
+  _ida.Future<String> verifyPasswordResetCode({
+    required _isc.UuidValue passwordResetRequestId,
     required String verificationCode,
   }) => caller.callServerEndpoint<String>(
     'emailIdp',
@@ -187,7 +191,7 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   ///
   /// Throws an [AuthUserBlockedException] if the auth user is blocked.
   @override
-  _i3.Future<void> finishPasswordReset({
+  _ida.Future<void> finishPasswordReset({
     required String finishPasswordResetToken,
     required String newPassword,
   }) => caller.callServerEndpoint<void>(
@@ -200,7 +204,7 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
   );
 
   @override
-  _i3.Future<bool> hasAccount() => caller.callServerEndpoint<bool>(
+  _ida.Future<bool> hasAccount() => caller.callServerEndpoint<bool>(
     'emailIdp',
     'hasAccount',
     {},
@@ -210,13 +214,18 @@ class EndpointEmailIdp extends _i1.EndpointEmailIdpBase {
 /// By extending [RefreshJwtTokensEndpoint], the JWT token refresh endpoint
 /// is made available on the server and enables automatic token refresh on the client.
 /// {@category Endpoint}
-class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
-  EndpointJwtRefresh(_i2.EndpointCaller caller) : super(caller);
+class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
+  EndpointJwtRefresh(_isc.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'jwtRefresh';
 
   /// Creates a new token pair for the given [refreshToken].
+  ///
+  /// If [refreshToken] is omitted, cookie-mode web clients fall back to the
+  /// configured HttpOnly refresh cookie. When neither source is present this
+  /// throws [RefreshTokenNotFoundException], the same public "no usable refresh
+  /// credential" exception used for unknown refresh tokens.
   ///
   /// Can throw the following exceptions:
   /// -[RefreshTokenMalformedException]: refresh token is malformed and could
@@ -235,64 +244,64 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   /// This endpoint is unauthenticated, meaning the client won't include any
   /// authentication information with the call.
   @override
-  _i3.Future<_i4.AuthSuccess> refreshAccessToken({
-    required String refreshToken,
-  }) => caller.callServerEndpoint<_i4.AuthSuccess>(
-    'jwtRefresh',
-    'refreshAccessToken',
-    {'refreshToken': refreshToken},
-    authenticated: false,
-  );
+  _ida.Future<_iacc.AuthSuccess> refreshAccessToken({String? refreshToken}) =>
+      caller.callServerEndpoint<_iacc.AuthSuccess>(
+        'jwtRefresh',
+        'refreshAccessToken',
+        {'refreshToken': refreshToken},
+        authenticated: false,
+      );
 }
 
 /// {@category Endpoint}
-class EndpointAdmin extends _i2.EndpointRef {
-  EndpointAdmin(_i2.EndpointCaller caller) : super(caller);
+class EndpointAdmin extends _isc.EndpointRef {
+  EndpointAdmin(_isc.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'admin';
 
   /// Create a new Quiz
-  _i3.Future<_i5.Quiz> createQuiz(_i5.Quiz quiz) =>
-      caller.callServerEndpoint<_i5.Quiz>(
+  _ida.Future<_ibf9eeue.Quiz> createQuiz(_ibf9eeue.Quiz quiz) =>
+      caller.callServerEndpoint<_ibf9eeue.Quiz>(
         'admin',
         'createQuiz',
         {'quiz': quiz},
       );
 
   /// Get all quizzes
-  _i3.Future<List<_i5.Quiz>> getQuizzes() =>
-      caller.callServerEndpoint<List<_i5.Quiz>>(
+  _ida.Future<List<_ibf9eeue.Quiz>> getQuizzes() =>
+      caller.callServerEndpoint<List<_ibf9eeue.Quiz>>(
         'admin',
         'getQuizzes',
         {},
       );
 
   /// Get a single quiz by ID
-  _i3.Future<_i5.Quiz?> getQuiz(int id) => caller.callServerEndpoint<_i5.Quiz?>(
-    'admin',
-    'getQuiz',
-    {'id': id},
-  );
+  _ida.Future<_ibf9eeue.Quiz?> getQuiz(int id) =>
+      caller.callServerEndpoint<_ibf9eeue.Quiz?>(
+        'admin',
+        'getQuiz',
+        {'id': id},
+      );
 
   /// Add a Question to a Quiz
-  _i3.Future<_i6.Question> addQuestion(_i6.Question question) =>
-      caller.callServerEndpoint<_i6.Question>(
+  _ida.Future<_imhbbxog.Question> addQuestion(_imhbbxog.Question question) =>
+      caller.callServerEndpoint<_imhbbxog.Question>(
         'admin',
         'addQuestion',
         {'question': question},
       );
 
   /// Get questions for a quiz
-  _i3.Future<List<_i6.Question>> getQuestionsForQuiz(int quizId) =>
-      caller.callServerEndpoint<List<_i6.Question>>(
+  _ida.Future<List<_imhbbxog.Question>> getQuestionsForQuiz(int quizId) =>
+      caller.callServerEndpoint<List<_imhbbxog.Question>>(
         'admin',
         'getQuestionsForQuiz',
         {'quizId': quizId},
       );
 
   /// Delete a Quiz
-  _i3.Future<void> deleteQuiz(int quizId) => caller.callServerEndpoint<void>(
+  _ida.Future<void> deleteQuiz(int quizId) => caller.callServerEndpoint<void>(
     'admin',
     'deleteQuiz',
     {'quizId': quizId},
@@ -300,17 +309,17 @@ class EndpointAdmin extends _i2.EndpointRef {
 }
 
 /// {@category Endpoint}
-class EndpointKahoot extends _i2.EndpointRef {
-  EndpointKahoot(_i2.EndpointCaller caller) : super(caller);
+class EndpointKahoot extends _isc.EndpointRef {
+  EndpointKahoot(_isc.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'kahoot';
 
   /// Create a new Game Session from a Quiz and return the PIN
-  _i3.Future<_i7.GameSession> createGame(
+  _ida.Future<_i5juiv7o.GameSession> createGame(
     int quizId,
     int hostId,
-  ) => caller.callServerEndpoint<_i7.GameSession>(
+  ) => caller.callServerEndpoint<_i5juiv7o.GameSession>(
     'kahoot',
     'createGame',
     {
@@ -320,19 +329,22 @@ class EndpointKahoot extends _i2.EndpointRef {
   );
 
   /// Get Game Info by PIN
-  _i3.Future<_i7.GameSession?> getGameByPin(String pin) =>
-      caller.callServerEndpoint<_i7.GameSession?>(
+  _ida.Future<_i5juiv7o.GameSession?> getGameByPin(String pin) =>
+      caller.callServerEndpoint<_i5juiv7o.GameSession?>(
         'kahoot',
         'getGameByPin',
         {'pin': pin},
       );
 
   /// Players and Host call this stream to receive real-time updates
-  _i3.Stream<_i8.GameEvent> gameStream(
+  _ida.Stream<_i43ngwq2.GameEvent> gameStream(
     String pin,
     bool isHost,
-  ) => caller
-      .callStreamingServerEndpoint<_i3.Stream<_i8.GameEvent>, _i8.GameEvent>(
+  ) =>
+      caller.callStreamingServerEndpoint<
+        _ida.Stream<_i43ngwq2.GameEvent>,
+        _i43ngwq2.GameEvent
+      >(
         'kahoot',
         'gameStream',
         {
@@ -343,9 +355,9 @@ class EndpointKahoot extends _i2.EndpointRef {
       );
 
   /// Send an event manually over the channel
-  _i3.Future<void> sendEvent(
+  _ida.Future<void> sendEvent(
     String pin,
-    _i8.GameEvent event,
+    _i43ngwq2.GameEvent event,
     bool toHostOnly,
   ) => caller.callServerEndpoint<void>(
     'kahoot',
@@ -358,10 +370,10 @@ class EndpointKahoot extends _i2.EndpointRef {
   );
 
   /// Join a game
-  _i3.Future<_i9.Player?> joinGame(
+  _ida.Future<_iowcd9iw.Player?> joinGame(
     String pin,
     String username,
-  ) => caller.callServerEndpoint<_i9.Player?>(
+  ) => caller.callServerEndpoint<_iowcd9iw.Player?>(
     'kahoot',
     'joinGame',
     {
@@ -371,22 +383,23 @@ class EndpointKahoot extends _i2.EndpointRef {
   );
 
   /// Host starts the first question
-  _i3.Future<void> startQuestion(String pin) => caller.callServerEndpoint<void>(
-    'kahoot',
-    'startQuestion',
-    {'pin': pin},
-  );
+  _ida.Future<void> startQuestion(String pin) =>
+      caller.callServerEndpoint<void>(
+        'kahoot',
+        'startQuestion',
+        {'pin': pin},
+      );
 
   /// Host transitions to the next question
-  _i3.Future<_i7.GameSession?> nextQuestion(String pin) =>
-      caller.callServerEndpoint<_i7.GameSession?>(
+  _ida.Future<_i5juiv7o.GameSession?> nextQuestion(String pin) =>
+      caller.callServerEndpoint<_i5juiv7o.GameSession?>(
         'kahoot',
         'nextQuestion',
         {'pin': pin},
       );
 
-  /// Player submits an answer, returning points earned
-  _i3.Future<int> submitAnswer(
+  /// Player submits an answer, returning points earned (or 0 if duplicate/invalid)
+  _ida.Future<int> submitAnswer(
     String pin,
     int playerId,
     int optionIndex,
@@ -400,23 +413,93 @@ class EndpointKahoot extends _i2.EndpointRef {
     },
   );
 
+  /// Check if a player has already submitted an answer for a question
+  _ida.Future<bool> hasAnsweredQuestion(
+    String pin,
+    int playerId,
+    int questionIndex,
+  ) => caller.callServerEndpoint<bool>(
+    'kahoot',
+    'hasAnsweredQuestion',
+    {
+      'pin': pin,
+      'playerId': playerId,
+      'questionIndex': questionIndex,
+    },
+  );
+
+  /// Reconnect an existing player across page refresh or tab reconnection
+  _ida.Future<_iowcd9iw.Player?> reconnectPlayer(
+    String pin,
+    int playerId,
+  ) => caller.callServerEndpoint<_iowcd9iw.Player?>(
+    'kahoot',
+    'reconnectPlayer',
+    {
+      'pin': pin,
+      'playerId': playerId,
+    },
+  );
+
+  /// Get current player details (including updated score)
+  _ida.Future<_iowcd9iw.Player?> getPlayer(int playerId) =>
+      caller.callServerEndpoint<_iowcd9iw.Player?>(
+        'kahoot',
+        'getPlayer',
+        {'playerId': playerId},
+      );
+
+  /// Get all players currently registered for a game session
+  _ida.Future<List<_iowcd9iw.Player>> getPlayers(String pin) =>
+      caller.callServerEndpoint<List<_iowcd9iw.Player>>(
+        'kahoot',
+        'getPlayers',
+        {'pin': pin},
+      );
+
+  /// Player leaves the game (e.g. clicked Leave or closed browser)
+  _ida.Future<bool> leaveGame(
+    String pin,
+    int playerId,
+  ) => caller.callServerEndpoint<bool>(
+    'kahoot',
+    'leaveGame',
+    {
+      'pin': pin,
+      'playerId': playerId,
+    },
+  );
+
+  /// Host removes or kicks a player from the lobby / game
+  _ida.Future<bool> removePlayer(
+    String pin,
+    int playerId,
+  ) => caller.callServerEndpoint<bool>(
+    'kahoot',
+    'removePlayer',
+    {
+      'pin': pin,
+      'playerId': playerId,
+    },
+  );
+
   /// Host ends the question, locking responses and revealing the answer
-  _i3.Future<void> endQuestion(String pin) => caller.callServerEndpoint<void>(
+  _ida.Future<void> endQuestion(String pin) => caller.callServerEndpoint<void>(
     'kahoot',
     'endQuestion',
     {'pin': pin},
   );
 
   /// Host shows leaderboard
-  _i3.Future<void> showLeaderboard(String pin) =>
+  _ida.Future<void> showLeaderboard(String pin) =>
       caller.callServerEndpoint<void>(
         'kahoot',
         'showLeaderboard',
         {'pin': pin},
       );
 
-  /// Host finishes the game and reveals the podium (top 3)
-  _i3.Future<void> finishGame(String pin) => caller.callServerEndpoint<void>(
+  /// Host finishes the game and reveals the podium (top 3) and full ranks for all players
+  _ida.Future<void> finishGame(String pin) => caller.callServerEndpoint<void>(
     'kahoot',
     'finishGame',
     {'pin': pin},
@@ -425,36 +508,33 @@ class EndpointKahoot extends _i2.EndpointRef {
 
 class Modules {
   Modules(Client client) {
-    serverpod_auth_idp = _i1.Caller(client);
-    serverpod_auth_core = _i4.Caller(client);
+    serverpod_auth_idp = _iaic.Caller(client);
+    serverpod_auth_core = _iacc.Caller(client);
   }
 
-  late final _i1.Caller serverpod_auth_idp;
+  late final _iaic.Caller serverpod_auth_idp;
 
-  late final _i4.Caller serverpod_auth_core;
+  late final _iacc.Caller serverpod_auth_core;
 }
 
-class Client extends _i2.ServerpodClientShared {
+class Client extends _isc.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
-    @Deprecated(
-      'Use authKeyProvider instead. This will be removed in future releases.',
-    )
-    super.authenticationKeyManager,
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
     Function(
-      _i2.MethodCallContext,
+      _isc.MethodCallContext,
       Object,
       StackTrace,
     )?
     onFailedCall,
-    Function(_i2.MethodCallContext)? onSucceededCall,
+    Function(_isc.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
+    _i85jenna.Client? httpClientOverride,
   }) : super(
          host,
-         _i10.Protocol(),
+         _il2as5qe.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -462,6 +542,7 @@ class Client extends _i2.ServerpodClientShared {
          onSucceededCall: onSucceededCall,
          disconnectStreamsOnLostInternetConnection:
              disconnectStreamsOnLostInternetConnection,
+         httpClientOverride: httpClientOverride,
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
@@ -481,7 +562,7 @@ class Client extends _i2.ServerpodClientShared {
   late final Modules modules;
 
   @override
-  Map<String, _i2.EndpointRef> get endpointRefLookup => {
+  Map<String, _isc.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
     'admin': admin,
@@ -489,7 +570,7 @@ class Client extends _i2.ServerpodClientShared {
   };
 
   @override
-  Map<String, _i2.ModuleEndpointCaller> get moduleLookup => {
+  Map<String, _isc.ModuleEndpointCaller> get moduleLookup => {
     'serverpod_auth_idp': modules.serverpod_auth_idp,
     'serverpod_auth_core': modules.serverpod_auth_core,
   };

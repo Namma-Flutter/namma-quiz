@@ -6,7 +6,6 @@ import 'package:serverpod_auth_idp_server/providers/email.dart';
 
 import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
-import 'src/web/routes/app_config_route.dart';
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
@@ -30,27 +29,21 @@ void run(List<String> args) async {
     ],
   );
 
-  // Build the web server routes.
-  pod.webServer.addRoute(StaticRoute.file(File('web/pages/index.html')), '/');
-  pod.webServer.addRoute(StaticRoute.file(File('web/pages/index.html')), '/index.html');
-  
-  // Create and serve static files (CSS, Images, etc)
-  final staticDir = Directory('web/static');
-  pod.webServer.addRoute(StaticRoute.directory(staticDir), '/static/*');
-
-  // App configuration route (needed by Flutter)
-  pod.webServer.addRoute(
-    AppConfigRoute(apiConfig: pod.config.apiServer),
-    '/app/assets/assets/config.json',
-  );
-
-  // Serve the Flutter web app (if built)
-  final appDir = Directory('web/app');
-  final indexHtml = File('web/app/index.html');
-  if (indexHtml.existsSync()) {
-    pod.webServer.addRoute(FlutterRoute(appDir), '/app/*');
+  // Build the web server routes (Jaspr Web SPA)
+  final jasprDir = Directory('web/jaspr');
+  final jasprIndex = File('web/jaspr/index.html');
+  if (jasprIndex.existsSync()) {
+    pod.webServer.addRoute(
+      SpaRoute(
+        jasprDir,
+        fallback: jasprIndex,
+      ),
+      '/',
+    );
   } else {
-    stderr.writeln('WARNING: web/app/index.html not found. Flutter web app will not be served.');
+    stderr.writeln(
+      'WARNING: web/jaspr/index.html not found. Jaspr web app will not be served.',
+    );
   }
 
   // Start the server.

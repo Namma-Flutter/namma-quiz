@@ -16,7 +16,7 @@ class App extends StatelessComponent {
       div(classes: 'shell', [
         Router(routes: [
           Route(path: '/', title: 'Namma Quiz', builder: (context, state) => const HomePage()),
-          Route(path: '/play', title: 'Player - Namma Quiz', builder: (context, state) => const PlayerBoard()),
+          Route(path: '/play', title: 'Player - Namma Quiz', builder: (context, state) => PlayerBoard(initialPin: state.queryParams['pin'])),
           Route(path: '/host', title: 'Host - Namma Quiz', builder: (context, state) => const HostDashboard()),
           Route(path: '/admin', title: 'Admin - Namma Quiz', builder: (context, state) => const AdminDashboard()),
         ]),

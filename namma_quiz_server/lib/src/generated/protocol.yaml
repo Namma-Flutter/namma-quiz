@@ -25,6 +25,12 @@ kahoot:
   - startQuestion:
   - nextQuestion:
   - submitAnswer:
+  - hasAnsweredQuestion:
+  - reconnectPlayer:
+  - getPlayer:
+  - getPlayers:
+  - leaveGame:
+  - removePlayer:
   - endQuestion:
   - showLeaderboard:
   - finishGame:
