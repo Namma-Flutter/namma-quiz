@@ -1,6 +1,6 @@
 project:
   projectId: namma-quiz
-  dartSdk: "3.12"
+  dartSdk: "3.13"
   scripts:
     pre_deploy:
       - serverpod generate
