@@ -265,7 +265,7 @@ class _HomePageState extends State<HomePage> {
             div(classes: 'bento-card bento-col-8', [
               div([
                 div(classes: 'bento-icon-box', attributes: {'style': 'background: #EEEDFE; color: var(--brand-purple);'}, [
-                  i([], classes: 'ti ti-antenna-bars-5', []),
+                  i([], classes: 'ti ti-antenna-bars-5'),
                 ]),
                 h3(classes: 't-title mb8', [Component.text('Sub-Second WebSocket Synchronization')]),
                 p(classes: 't-body mb20', [
@@ -292,7 +292,7 @@ class _HomePageState extends State<HomePage> {
             div(classes: 'bento-card bento-col-4', [
               div([
                 div(classes: 'bento-icon-box', attributes: {'style': 'background: #FAEEDA; color: #BA7517;'}, [
-                  i([], classes: 'ti ti-trophy', []),
+                  i([], classes: 'ti ti-trophy'),
                 ]),
                 h3(classes: 't-title mb8', [Component.text('Game-Show Dynamic Podiums')]),
                 p(classes: 't-body mb20', [
@@ -304,10 +304,10 @@ class _HomePageState extends State<HomePage> {
               div(attributes: {
                 'style': 'display: flex; gap: 6px; align-items: flex-end; height: 44px; padding-bottom: 4px;',
               }, [
-                div(attributes: {'style': 'flex: 1; height: 60%; background: var(--kahoot-red); border-radius: 6px 6px 0 0;'}),
-                div(attributes: {'style': 'flex: 1; height: 100%; background: var(--kahoot-blue); border-radius: 6px 6px 0 0;'}),
-                div(attributes: {'style': 'flex: 1; height: 45%; background: var(--kahoot-yellow); border-radius: 6px 6px 0 0;'}),
-                div(attributes: {'style': 'flex: 1; height: 80%; background: var(--kahoot-green); border-radius: 6px 6px 0 0;'}),
+                div([], attributes: {'style': 'flex: 1; height: 60%; background: var(--kahoot-red); border-radius: 6px 6px 0 0;'}),
+                div([], attributes: {'style': 'flex: 1; height: 100%; background: var(--kahoot-blue); border-radius: 6px 6px 0 0;'}),
+                div([], attributes: {'style': 'flex: 1; height: 45%; background: var(--kahoot-yellow); border-radius: 6px 6px 0 0;'}),
+                div([], attributes: {'style': 'flex: 1; height: 80%; background: var(--kahoot-green); border-radius: 6px 6px 0 0;'}),
               ]),
             ]),
 
@@ -315,7 +315,7 @@ class _HomePageState extends State<HomePage> {
             div(classes: 'bento-card bento-col-6', [
               div([
                 div(classes: 'bento-icon-box', attributes: {'style': 'background: #E1F5EE; color: #085041;'}, [
-                  i([], classes: 'ti ti-device-mobile-check', []),
+                  i([], classes: 'ti ti-device-mobile-check'),
                 ]),
                 h3(classes: 't-title mb8', [Component.text('Zero-Install Participant Flow')]),
                 p(classes: 't-body mb16', [
@@ -334,7 +334,7 @@ class _HomePageState extends State<HomePage> {
             div(classes: 'bento-card bento-col-6', [
               div([
                 div(classes: 'bento-icon-box', attributes: {'style': 'background: #FAECE7; color: #712B13;'}, [
-                  i([], classes: 'ti ti-layout-grid-add', []),
+                  i([], classes: 'ti ti-layout-grid-add'),
                 ]),
                 h3(classes: 't-title mb8', [Component.text('Interactive Quiz Studio')]),
                 p(classes: 't-body mb16', [

@@ -108,7 +108,7 @@ class _HostDashboardState extends State<HostDashboard> {
         else if (quizzes.isEmpty)
           div(classes: 'card card-body flex-col flex-center', attributes: {'style': 'padding: 48px 20px; text-align: center;'}, [
             div(classes: 'bento-icon-box mb16', attributes: {'style': 'background: var(--brand-purple-light); color: var(--brand-purple); width: 64px; height: 64px; font-size: 32px; margin: 0 auto 16px;'}, [
-              i([], classes: 'ti ti-clipboard-list', []),
+              i([], classes: 'ti ti-clipboard-list'),
             ]),
             h3(classes: 't-title mb8', [Component.text('No quizzes created yet')]),
             p(classes: 't-body mb20', attributes: {'style': 'max-width: 400px; margin: 0 auto 20px;'}, [
@@ -118,7 +118,7 @@ class _HostDashboardState extends State<HostDashboard> {
               classes: 'btn btn-brand',
               events: {'click': (e) => Router.of(context).push('/admin')},
               [
-                i([], classes: 'ti ti-plus', []),
+                i([], classes: 'ti ti-plus'),
                 Component.text('Open Quiz Studio'),
               ],
             ),
@@ -137,7 +137,7 @@ class _HostDashboardState extends State<HostDashboard> {
                     div(classes: 'bento-icon-box', attributes: {
                       'style': 'background: var(--brand-purple-light); color: var(--brand-purple); margin-bottom: 0; flex-shrink: 0;',
                     }, [
-                      i([], classes: 'ti ti-bolt', []),
+                      i([], classes: 'ti ti-bolt'),
                     ]),
                     div(attributes: {'style': 'flex: 1;'}, [
                       h3(classes: 't-title', [Component.text(quiz.title)]),
@@ -182,7 +182,7 @@ class _HostDashboardState extends State<HostDashboard> {
           span(classes: 't-sub', attributes: {'style': 'margin-left: 8px;'}, [Component.text('• Waiting for participants')]),
         ]),
         div(classes: 'chip chip-live', [
-          span(classes: 'live-dot', attributes: {'style': 'margin-right: 6px;'}),
+          span([], classes: 'live-dot', attributes: {'style': 'margin-right: 6px;'}),
           Component.text('Room Active'),
         ]),
       ]),
@@ -382,22 +382,22 @@ class _HostDashboardState extends State<HostDashboard> {
         div(classes: 'tiles-grid', attributes: {'style': 'flex-shrink: 0;'}, [
           if (question.options.isNotEmpty)
             div(classes: 'tile ta', [
-              div(classes: 'tile-icon', [i([], classes: 'ti ti-triangle-filled', [])]),
+              div(classes: 'tile-icon', [i([], classes: 'ti ti-triangle-filled')]),
               span(classes: 'tile-text', [Component.text(question.options[0])]),
             ]),
           if (question.options.length > 1)
             div(classes: 'tile tb', [
-              div(classes: 'tile-icon', [i([], classes: 'ti ti-diamond-filled', [])]),
+              div(classes: 'tile-icon', [i([], classes: 'ti ti-diamond-filled')]),
               span(classes: 'tile-text', [Component.text(question.options[1])]),
             ]),
           if (question.options.length > 2)
             div(classes: 'tile tc', [
-              div(classes: 'tile-icon', [i([], classes: 'ti ti-circle-filled', [])]),
+              div(classes: 'tile-icon', [i([], classes: 'ti ti-circle-filled')]),
               span(classes: 'tile-text', [Component.text(question.options[2])]),
             ]),
           if (question.options.length > 3)
             div(classes: 'tile td', [
-              div(classes: 'tile-icon', [i([], classes: 'ti ti-square-filled', [])]),
+              div(classes: 'tile-icon', [i([], classes: 'ti ti-square-filled')]),
               span(classes: 'tile-text', [Component.text(question.options[3])]),
             ]),
         ]),
@@ -769,13 +769,13 @@ class _HostDashboardState extends State<HostDashboard> {
               context.read(gameProvider.notifier).reset();
               Router.of(context).push('/host');
             }
-          }, [i([], classes: 'ti ti-refresh', []), Component.text('Play Again')]),
+          }, [i([], classes: 'ti ti-refresh'), Component.text('Play Again')]),
           button(classes: 'btn btn-white btn-lg', attributes: {'style': 'flex: 1;'}, events: {
             'click': (e) {
               context.read(gameProvider.notifier).reset();
               Router.of(context).push('/');
             }
-          }, [i([], classes: 'ti ti-home', []), Component.text('Return Home')]),
+          }, [i([], classes: 'ti ti-home'), Component.text('Return Home')]),
         ]),
       ]),
     ]);

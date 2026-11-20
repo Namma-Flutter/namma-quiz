@@ -322,7 +322,7 @@ class _PlayerBoardState extends State<PlayerBoard> {
               classes: 'tile ta ${isAnswerSubmitted ? "disabled" : ""}',
               onClick: isAnswerSubmitted ? null : () => context.read(gameProvider.notifier).submitAnswer(0),
               [
-                div(classes: 'tile-icon', [i([], classes: 'ti ti-triangle-filled', [])]),
+                div(classes: 'tile-icon', [i([], classes: 'ti ti-triangle-filled')]),
                 div(classes: 'tile-text', [Component.text(question.options[0])]),
               ],
             ),
@@ -332,7 +332,7 @@ class _PlayerBoardState extends State<PlayerBoard> {
               classes: 'tile tb ${isAnswerSubmitted ? "disabled" : ""}',
               onClick: isAnswerSubmitted ? null : () => context.read(gameProvider.notifier).submitAnswer(1),
               [
-                div(classes: 'tile-icon', [i([], classes: 'ti ti-diamond-filled', [])]),
+                div(classes: 'tile-icon', [i([], classes: 'ti ti-diamond-filled')]),
                 div(classes: 'tile-text', [Component.text(question.options[1])]),
               ],
             ),
@@ -342,7 +342,7 @@ class _PlayerBoardState extends State<PlayerBoard> {
               classes: 'tile tc ${isAnswerSubmitted ? "disabled" : ""}',
               onClick: isAnswerSubmitted ? null : () => context.read(gameProvider.notifier).submitAnswer(2),
               [
-                div(classes: 'tile-icon', [i([], classes: 'ti ti-circle-filled', [])]),
+                div(classes: 'tile-icon', [i([], classes: 'ti ti-circle-filled')]),
                 div(classes: 'tile-text', [Component.text(question.options[2])]),
               ],
             ),
@@ -352,7 +352,7 @@ class _PlayerBoardState extends State<PlayerBoard> {
               classes: 'tile td ${isAnswerSubmitted ? "disabled" : ""}',
               onClick: isAnswerSubmitted ? null : () => context.read(gameProvider.notifier).submitAnswer(3),
               [
-                div(classes: 'tile-icon', [i([], classes: 'ti ti-square-filled', [])]),
+                div(classes: 'tile-icon', [i([], classes: 'ti ti-square-filled')]),
                 div(classes: 'tile-text', [Component.text(question.options[3])]),
               ],
             ),

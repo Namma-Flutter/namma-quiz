@@ -4,6 +4,7 @@ import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:namma_kahoot_client/namma_kahoot_client.dart';
 import '../providers/client_provider.dart';
+import '../providers/game_provider.dart';
 
 class AdminDashboard extends StatefulComponent {
   const AdminDashboard({super.key});
@@ -197,7 +198,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             attributes: {'style': 'padding: 12px 24px; cursor: pointer;'},
             events: {'click': (e) => _createQuiz()},
             [
-              i([], classes: 'ti ti-plus', []),
+              i([], classes: 'ti ti-plus'),
               Component.text('Create Deck'),
             ],
           ),
@@ -244,7 +245,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     div(classes: 'bento-icon-box', attributes: {
                       'style': 'background: var(--brand-purple-light); color: var(--brand-purple); width: 42px; height: 42px; font-size: 20px; margin-bottom: 0;',
                     }, [
-                      i([], classes: 'ti ti-folder', []),
+                      i([], classes: 'ti ti-folder'),
                     ]),
                     div([
                       h3(classes: 't-title', [Component.text(q.title)]),
@@ -295,7 +296,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       if (loadingQuestions)
         div(classes: 'card p20 flex-center mb20', [
           div(attributes: {'style': 'display: flex; align-items: center; gap: 8px; color: var(--color-text-secondary); font-weight: 600;'}, [
-            i([], classes: 'ti ti-loader spin-slow', []),
+            i([], classes: 'ti ti-loader spin-slow'),
             Component.text('Loading questions...'),
           ]),
         ])
@@ -346,7 +347,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           for (var i = 0; i < 4; i++)
             div(attributes: {
               'style':
-                  'background: var(--color-background-secondary); border: 1.5px solid ${correctOptionIndex == i ? "#26890C" : var(--color-border-primary)}; border-radius: 14px; padding: 14px; transition: border-color 0.15s ease;',
+                  'background: var(--color-background-secondary); border: 1.5px solid ${correctOptionIndex == i ? "#26890C" : "var(--color-border-primary)"}; border-radius: 14px; padding: 14px; transition: border-color 0.15s ease;',
             }, [
               label(
                 classes: 'flabel',
@@ -356,7 +357,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 },
                 [
                   span(attributes: {'style': 'display: flex; align-items: center; gap: 8px; font-weight: 800;'}, [
-                    span(attributes: {'style': 'width: 10px; height: 10px; border-radius: 50%; background: ${quadBorderColors[i]}; display: inline-block;'}),
+                    span([], attributes: {'style': 'width: 10px; height: 10px; border-radius: 50%; background: ${quadBorderColors[i]}; display: inline-block;'}),
                     Component.text(quadNames[i]),
                   ]),
                   input(
