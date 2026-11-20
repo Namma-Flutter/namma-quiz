@@ -1,0 +1,7 @@
+class: JoinResult
+fields:
+  playerId: int
+  gameSessionId: int
+  name: String
+  score: int
+  token: String # Secret token, only returned to the joining player

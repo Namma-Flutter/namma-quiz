@@ -7,3 +7,6 @@ pubspec_overrides.yaml
 
 # FVM Version Cache
 .fvm/
+
+# Session notes
+session*.md

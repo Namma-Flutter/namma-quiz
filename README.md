@@ -95,6 +95,35 @@ flutter run
 
 ---
 
+## 🔄 Session Persistence & Reconnect Architecture
+
+Namma Quiz implements robust session persistence and reconnection semantics across browser refreshes, tab closures, and transient connection losses.
+
+### Core Principles
+1. **Token-Based Identity:** Sockets are transient communication channels, not player identities. On join/host creation, the server issues a cryptographically secure 32-byte secret session token stored in browser `sessionStorage` (scoped per-tab) or in-memory for desktop/mobile clients.
+2. **Server-Side Security:** Tokens are hashed with SHA-256 before storage or validation (`scope=serverOnly`). Tokens are never broadcast to other players or the presenter.
+3. **Grace Periods & Disconnect Handling:**
+   - **`hideDelay` (1.5s):** Debounce window preventing host-side UI flicker on instantaneous page refreshes.
+   - **`lobbyGracePeriod` (5s):** Disconnected lobby players are pruned if they do not resume within 5 seconds.
+   - **`questionGracePeriod` (12s):** During active gameplay, players who disconnect have 12 seconds to resume before being marked as `away`. Their score and answer progress are preserved.
+   - **`hostGracePeriod` (30s):** If the host loses connection and does not reconnect within 30 seconds, the room is cleanly terminated (`ROOM_ENDED`) and player records are removed.
+4. **Stale-Socket Disconnect Guard:** If a reconnecting tab resumes with a new socket before the old socket's disconnect event finishes firing, the connection handle comparison ensures the newer socket is not inadvertently marked offline.
+5. **Duplicate Tab Policy:** When a duplicate connection presents an active session token, the newest connection takes priority; the existing socket is notified with `REPLACED` and closed.
+6. **Host Moderation (Kick):** Kicking a player closes their connection immediately, marks the player row as left, and records their token hash in `bannedTokenHashes` to prevent resuming or re-joining the same room.
+
+### Acceptance & Verification Checklist
+- [x] **Join:** Player receives secret token; visible in host lobby list.
+- [x] **Refresh within Grace:** Session restored from `sessionStorage`; reconnects without score or answer loss; hide debounce prevents flickering.
+- [x] **Close Tab:** Socket drops; player is hidden after `hideDelay`; deleted after grace period expires.
+- [x] **Player Leave:** Immediate cleanup, token invalidated, client storage purged.
+- [x] **Host Kick:** Immediate disconnect, banned token hash prevents resume/re-join, kicked player sees notification banner.
+- [x] **Stale Disconnect:** Out-of-order socket events do not evict a reconnected player.
+- [x] **Mid-Question Reconnect:** Locked answer restored or timer continues; duplicate answers prevented.
+- [x] **Host Reconnect:** Host dashboard re-attaches to live game state within `hostGracePeriod`.
+- [x] **Resource Cleanup:** All timers and room runtimes disposed upon room end.
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions from the community! Whether it's fixing a bug, improving documentation, or proposing a new feature, your help is appreciated.

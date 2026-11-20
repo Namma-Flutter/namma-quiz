@@ -19,13 +19,19 @@ abstract class Player implements _is.TableRow<int?>, _is.ProtocolSerialization {
     required this.gameSessionId,
     required this.name,
     required this.score,
-  });
+    String? status,
+    this.answersJson,
+    this.tokenHash,
+  }) : status = status ?? 'connected';
 
   factory Player({
     int? id,
     required int gameSessionId,
     required String name,
     required int score,
+    String? status,
+    String? answersJson,
+    String? tokenHash,
   }) = _PlayerImpl;
 
   factory Player.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -34,6 +40,9 @@ abstract class Player implements _is.TableRow<int?>, _is.ProtocolSerialization {
       gameSessionId: jsonSerialization['gameSessionId'] as int,
       name: jsonSerialization['name'] as String,
       score: jsonSerialization['score'] as int,
+      status: jsonSerialization['status'] as String?,
+      answersJson: jsonSerialization['answersJson'] as String?,
+      tokenHash: jsonSerialization['tokenHash'] as String?,
     );
   }
 
@@ -50,6 +59,12 @@ abstract class Player implements _is.TableRow<int?>, _is.ProtocolSerialization {
 
   int score;
 
+  String status;
+
+  String? answersJson;
+
+  String? tokenHash;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -61,6 +76,9 @@ abstract class Player implements _is.TableRow<int?>, _is.ProtocolSerialization {
     int? gameSessionId,
     String? name,
     int? score,
+    String? status,
+    String? answersJson,
+    String? tokenHash,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -70,6 +88,9 @@ abstract class Player implements _is.TableRow<int?>, _is.ProtocolSerialization {
       'gameSessionId': gameSessionId,
       'name': name,
       'score': score,
+      'status': status,
+      if (answersJson != null) 'answersJson': answersJson,
+      if (tokenHash != null) 'tokenHash': tokenHash,
     };
   }
 
@@ -81,6 +102,8 @@ abstract class Player implements _is.TableRow<int?>, _is.ProtocolSerialization {
       'gameSessionId': gameSessionId,
       'name': name,
       'score': score,
+      'status': status,
+      if (answersJson != null) 'answersJson': answersJson,
     };
   }
 
@@ -120,11 +143,17 @@ class _PlayerImpl extends Player {
     required int gameSessionId,
     required String name,
     required int score,
+    String? status,
+    String? answersJson,
+    String? tokenHash,
   }) : super._(
          id: id,
          gameSessionId: gameSessionId,
          name: name,
          score: score,
+         status: status,
+         answersJson: answersJson,
+         tokenHash: tokenHash,
        );
 
   /// Returns a shallow copy of this [Player]
@@ -136,12 +165,18 @@ class _PlayerImpl extends Player {
     int? gameSessionId,
     String? name,
     int? score,
+    String? status,
+    Object? answersJson = _Undefined,
+    Object? tokenHash = _Undefined,
   }) {
     return Player(
       id: id is int? ? id : this.id,
       gameSessionId: gameSessionId ?? this.gameSessionId,
       name: name ?? this.name,
       score: score ?? this.score,
+      status: status ?? this.status,
+      answersJson: answersJson is String? ? answersJson : this.answersJson,
+      tokenHash: tokenHash is String? ? tokenHash : this.tokenHash,
     );
   }
 }
@@ -163,6 +198,21 @@ class PlayerUpdateTable extends _is.UpdateTable<PlayerTable> {
     table.score,
     value,
   );
+
+  _is.ColumnValue<String, String> status(String value) => _is.ColumnValue(
+    table.status,
+    value,
+  );
+
+  _is.ColumnValue<String, String> answersJson(String? value) => _is.ColumnValue(
+    table.answersJson,
+    value,
+  );
+
+  _is.ColumnValue<String, String> tokenHash(String? value) => _is.ColumnValue(
+    table.tokenHash,
+    value,
+  );
 }
 
 class PlayerTable extends _is.Table<int?> {
@@ -180,6 +230,19 @@ class PlayerTable extends _is.Table<int?> {
       'score',
       this,
     );
+    status = _is.ColumnString(
+      'status',
+      this,
+      hasDefault: true,
+    );
+    answersJson = _is.ColumnString(
+      'answersJson',
+      this,
+    );
+    tokenHash = _is.ColumnString(
+      'tokenHash',
+      this,
+    );
   }
 
   late final PlayerUpdateTable updateTable;
@@ -190,12 +253,21 @@ class PlayerTable extends _is.Table<int?> {
 
   late final _is.ColumnInt score;
 
+  late final _is.ColumnString status;
+
+  late final _is.ColumnString answersJson;
+
+  late final _is.ColumnString tokenHash;
+
   @override
   List<_is.Column> get columns => [
     id,
     gameSessionId,
     name,
     score,
+    status,
+    answersJson,
+    tokenHash,
   ];
 }
 

@@ -20,17 +20,16 @@ kahoot:
   - createGame:
   - getGameByPin:
   - gameStream:
-  - sendEvent:
   - joinGame:
   - startQuestion:
   - nextQuestion:
   - submitAnswer:
   - hasAnsweredQuestion:
-  - reconnectPlayer:
+  - resumePlayer:
   - getPlayer:
   - getPlayers:
   - leaveGame:
-  - removePlayer:
+  - kickPlayer:
   - endQuestion:
   - showLeaderboard:
   - finishGame:

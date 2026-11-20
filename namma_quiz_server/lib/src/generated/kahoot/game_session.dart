@@ -23,6 +23,7 @@ abstract class GameSession
     required this.status,
     required this.currentQuestionIndex,
     this.startTime,
+    this.hostTokenHash,
   });
 
   factory GameSession({
@@ -33,6 +34,7 @@ abstract class GameSession
     required String status,
     required int currentQuestionIndex,
     DateTime? startTime,
+    String? hostTokenHash,
   }) = _GameSessionImpl;
 
   factory GameSession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -46,6 +48,7 @@ abstract class GameSession
       startTime: jsonSerialization['startTime'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['startTime']),
+      hostTokenHash: jsonSerialization['hostTokenHash'] as String?,
     );
   }
 
@@ -68,6 +71,8 @@ abstract class GameSession
 
   DateTime? startTime;
 
+  String? hostTokenHash;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -82,6 +87,7 @@ abstract class GameSession
     String? status,
     int? currentQuestionIndex,
     DateTime? startTime = const _is.$UndefinedDateTime(),
+    String? hostTokenHash,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -94,6 +100,7 @@ abstract class GameSession
       'status': status,
       'currentQuestionIndex': currentQuestionIndex,
       if (startTime != null) 'startTime': startTime?.toJson(),
+      if (hostTokenHash != null) 'hostTokenHash': hostTokenHash,
     };
   }
 
@@ -150,6 +157,7 @@ class _GameSessionImpl extends GameSession {
     required String status,
     required int currentQuestionIndex,
     DateTime? startTime,
+    String? hostTokenHash,
   }) : super._(
          id: id,
          pin: pin,
@@ -158,6 +166,7 @@ class _GameSessionImpl extends GameSession {
          status: status,
          currentQuestionIndex: currentQuestionIndex,
          startTime: startTime,
+         hostTokenHash: hostTokenHash,
        );
 
   /// Returns a shallow copy of this [GameSession]
@@ -172,6 +181,7 @@ class _GameSessionImpl extends GameSession {
     String? status,
     int? currentQuestionIndex,
     DateTime? startTime = const _is.$UndefinedDateTime(),
+    Object? hostTokenHash = _Undefined,
   }) {
     return GameSession(
       id: id is int? ? id : this.id,
@@ -183,6 +193,9 @@ class _GameSessionImpl extends GameSession {
       startTime: startTime is _is.UndefinedSentinel
           ? this.startTime
           : startTime,
+      hostTokenHash: hostTokenHash is String?
+          ? hostTokenHash
+          : this.hostTokenHash,
     );
   }
 }
@@ -220,6 +233,12 @@ class GameSessionUpdateTable extends _is.UpdateTable<GameSessionTable> {
         table.startTime,
         value,
       );
+
+  _is.ColumnValue<String, String> hostTokenHash(String? value) =>
+      _is.ColumnValue(
+        table.hostTokenHash,
+        value,
+      );
 }
 
 class GameSessionTable extends _is.Table<int?> {
@@ -249,6 +268,10 @@ class GameSessionTable extends _is.Table<int?> {
       'startTime',
       this,
     );
+    hostTokenHash = _is.ColumnString(
+      'hostTokenHash',
+      this,
+    );
   }
 
   late final GameSessionUpdateTable updateTable;
@@ -265,6 +288,8 @@ class GameSessionTable extends _is.Table<int?> {
 
   late final _is.ColumnDateTime startTime;
 
+  late final _is.ColumnString hostTokenHash;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -274,6 +299,7 @@ class GameSessionTable extends _is.Table<int?> {
     status,
     currentQuestionIndex,
     startTime,
+    hostTokenHash,
   ];
 }
 

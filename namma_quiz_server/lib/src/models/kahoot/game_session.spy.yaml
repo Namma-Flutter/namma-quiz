@@ -4,9 +4,10 @@ fields:
   pin: String
   quizId: int
   hostId: int
-  status: String # 'lobby', 'active', 'finished'
+  status: String # 'lobby', 'active', 'paused', 'finished'
   currentQuestionIndex: int
   startTime: DateTime?
+  hostTokenHash: String?, scope=serverOnly # SHA-256 of the host's secret token
 indexes:
   game_session_pin_idx:
     fields: pin

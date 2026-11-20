@@ -10,8 +10,6 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:namma_kahoot_server/src/generated/kahoot/game_event.dart'
-    as _i68w0vuw;
 import 'package:namma_kahoot_server/src/generated/kahoot/question.dart'
     as _iih33dk0;
 import 'package:namma_kahoot_server/src/generated/kahoot/quiz.dart'
@@ -429,37 +427,6 @@ class Endpoints extends _is.EndpointDispatch {
                     params['pin'],
                   ),
         ),
-        'sendEvent': _is.MethodConnector(
-          name: 'sendEvent',
-          params: {
-            'pin': _is.ParameterDescription(
-              name: 'pin',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-            'event': _is.ParameterDescription(
-              name: 'event',
-              type: _is.getType<_i68w0vuw.GameEvent>(),
-              nullable: false,
-            ),
-            'toHostOnly': _is.ParameterDescription(
-              name: 'toHostOnly',
-              type: _is.getType<bool>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['kahoot'] as _ixijk5ye.KahootEndpoint).sendEvent(
-                    session,
-                    params['pin'],
-                    params['event'],
-                    params['toHostOnly'],
-                  ),
-        ),
         'joinGame': _is.MethodConnector(
           name: 'joinGame',
           params: {
@@ -493,6 +460,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
+            'hostToken': _is.ParameterDescription(
+              name: 'hostToken',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -502,6 +474,7 @@ class Endpoints extends _is.EndpointDispatch {
                   .startQuestion(
                     session,
                     params['pin'],
+                    params['hostToken'],
                   ),
         ),
         'nextQuestion': _is.MethodConnector(
@@ -509,6 +482,11 @@ class Endpoints extends _is.EndpointDispatch {
           params: {
             'pin': _is.ParameterDescription(
               name: 'pin',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'hostToken': _is.ParameterDescription(
+              name: 'hostToken',
               type: _is.getType<String>(),
               nullable: false,
             ),
@@ -521,6 +499,7 @@ class Endpoints extends _is.EndpointDispatch {
                   .nextQuestion(
                     session,
                     params['pin'],
+                    params['hostToken'],
                   ),
         ),
         'submitAnswer': _is.MethodConnector(
@@ -531,9 +510,9 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
-            'playerId': _is.ParameterDescription(
-              name: 'playerId',
-              type: _is.getType<int>(),
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
               nullable: false,
             ),
             'optionIndex': _is.ParameterDescription(
@@ -550,7 +529,7 @@ class Endpoints extends _is.EndpointDispatch {
                   .submitAnswer(
                     session,
                     params['pin'],
-                    params['playerId'],
+                    params['token'],
                     params['optionIndex'],
                   ),
         ),
@@ -562,9 +541,9 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
-            'playerId': _is.ParameterDescription(
-              name: 'playerId',
-              type: _is.getType<int>(),
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
               nullable: false,
             ),
             'questionIndex': _is.ParameterDescription(
@@ -581,21 +560,21 @@ class Endpoints extends _is.EndpointDispatch {
                   .hasAnsweredQuestion(
                     session,
                     params['pin'],
-                    params['playerId'],
+                    params['token'],
                     params['questionIndex'],
                   ),
         ),
-        'reconnectPlayer': _is.MethodConnector(
-          name: 'reconnectPlayer',
+        'resumePlayer': _is.MethodConnector(
+          name: 'resumePlayer',
           params: {
             'pin': _is.ParameterDescription(
               name: 'pin',
               type: _is.getType<String>(),
               nullable: false,
             ),
-            'playerId': _is.ParameterDescription(
-              name: 'playerId',
-              type: _is.getType<int>(),
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
               nullable: false,
             ),
           },
@@ -604,10 +583,10 @@ class Endpoints extends _is.EndpointDispatch {
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async => (endpoints['kahoot'] as _ixijk5ye.KahootEndpoint)
-                  .reconnectPlayer(
+                  .resumePlayer(
                     session,
                     params['pin'],
-                    params['playerId'],
+                    params['token'],
                   ),
         ),
         'getPlayer': _is.MethodConnector(
@@ -656,9 +635,9 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
-            'playerId': _is.ParameterDescription(
-              name: 'playerId',
-              type: _is.getType<int>(),
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
               nullable: false,
             ),
           },
@@ -670,14 +649,19 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['kahoot'] as _ixijk5ye.KahootEndpoint).leaveGame(
                     session,
                     params['pin'],
-                    params['playerId'],
+                    params['token'],
                   ),
         ),
-        'removePlayer': _is.MethodConnector(
-          name: 'removePlayer',
+        'kickPlayer': _is.MethodConnector(
+          name: 'kickPlayer',
           params: {
             'pin': _is.ParameterDescription(
               name: 'pin',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'hostToken': _is.ParameterDescription(
+              name: 'hostToken',
               type: _is.getType<String>(),
               nullable: false,
             ),
@@ -691,10 +675,11 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['kahoot'] as _ixijk5ye.KahootEndpoint)
-                  .removePlayer(
+              ) async =>
+                  (endpoints['kahoot'] as _ixijk5ye.KahootEndpoint).kickPlayer(
                     session,
                     params['pin'],
+                    params['hostToken'],
                     params['playerId'],
                   ),
         ),
@@ -703,6 +688,11 @@ class Endpoints extends _is.EndpointDispatch {
           params: {
             'pin': _is.ParameterDescription(
               name: 'pin',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'hostToken': _is.ParameterDescription(
+              name: 'hostToken',
               type: _is.getType<String>(),
               nullable: false,
             ),
@@ -715,6 +705,7 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['kahoot'] as _ixijk5ye.KahootEndpoint).endQuestion(
                     session,
                     params['pin'],
+                    params['hostToken'],
                   ),
         ),
         'showLeaderboard': _is.MethodConnector(
@@ -722,6 +713,11 @@ class Endpoints extends _is.EndpointDispatch {
           params: {
             'pin': _is.ParameterDescription(
               name: 'pin',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'hostToken': _is.ParameterDescription(
+              name: 'hostToken',
               type: _is.getType<String>(),
               nullable: false,
             ),
@@ -734,6 +730,7 @@ class Endpoints extends _is.EndpointDispatch {
                   .showLeaderboard(
                     session,
                     params['pin'],
+                    params['hostToken'],
                   ),
         ),
         'finishGame': _is.MethodConnector(
@@ -741,6 +738,11 @@ class Endpoints extends _is.EndpointDispatch {
           params: {
             'pin': _is.ParameterDescription(
               name: 'pin',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'hostToken': _is.ParameterDescription(
+              name: 'hostToken',
               type: _is.getType<String>(),
               nullable: false,
             ),
@@ -753,6 +755,7 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['kahoot'] as _ixijk5ye.KahootEndpoint).finishGame(
                     session,
                     params['pin'],
+                    params['hostToken'],
                   ),
         ),
         'gameStream': _is.MethodStreamConnector(
@@ -768,6 +771,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<bool>(),
               nullable: false,
             ),
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
           },
           streamParams: {},
           returnType: _is.MethodStreamReturnType.streamType,
@@ -780,6 +788,7 @@ class Endpoints extends _is.EndpointDispatch {
                 session,
                 params['pin'],
                 params['isHost'],
+                params['token'],
               ),
         ),
       },

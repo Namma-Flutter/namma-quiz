@@ -19,13 +19,17 @@ abstract class Player
     required this.gameSessionId,
     required this.name,
     required this.score,
-  });
+    String? status,
+    this.answersJson,
+  }) : status = status ?? 'connected';
 
   factory Player({
     int? id,
     required int gameSessionId,
     required String name,
     required int score,
+    String? status,
+    String? answersJson,
   }) = _PlayerImpl;
 
   factory Player.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -34,6 +38,8 @@ abstract class Player
       gameSessionId: jsonSerialization['gameSessionId'] as int,
       name: jsonSerialization['name'] as String,
       score: jsonSerialization['score'] as int,
+      status: jsonSerialization['status'] as String?,
+      answersJson: jsonSerialization['answersJson'] as String?,
     );
   }
 
@@ -48,6 +54,10 @@ abstract class Player
 
   int score;
 
+  String status;
+
+  String? answersJson;
+
   /// Returns a shallow copy of this [Player]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -56,6 +66,8 @@ abstract class Player
     int? gameSessionId,
     String? name,
     int? score,
+    String? status,
+    String? answersJson,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -65,6 +77,8 @@ abstract class Player
       'gameSessionId': gameSessionId,
       'name': name,
       'score': score,
+      'status': status,
+      if (answersJson != null) 'answersJson': answersJson,
     };
   }
 
@@ -76,6 +90,8 @@ abstract class Player
       'gameSessionId': gameSessionId,
       'name': name,
       'score': score,
+      'status': status,
+      if (answersJson != null) 'answersJson': answersJson,
     };
   }
 
@@ -93,11 +109,15 @@ class _PlayerImpl extends Player {
     required int gameSessionId,
     required String name,
     required int score,
+    String? status,
+    String? answersJson,
   }) : super._(
          id: id,
          gameSessionId: gameSessionId,
          name: name,
          score: score,
+         status: status,
+         answersJson: answersJson,
        );
 
   /// Returns a shallow copy of this [Player]
@@ -109,12 +129,16 @@ class _PlayerImpl extends Player {
     int? gameSessionId,
     String? name,
     int? score,
+    String? status,
+    Object? answersJson = _Undefined,
   }) {
     return Player(
       id: id is int? ? id : this.id,
       gameSessionId: gameSessionId ?? this.gameSessionId,
       name: name ?? this.name,
       score: score ?? this.score,
+      status: status ?? this.status,
+      answersJson: answersJson is String? ? answersJson : this.answersJson,
     );
   }
 }

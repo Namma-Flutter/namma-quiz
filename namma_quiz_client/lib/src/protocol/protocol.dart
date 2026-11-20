@@ -23,11 +23,15 @@ import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'kahoot/game_event.dart' as _id6llbty;
 import 'kahoot/game_session.dart' as _iaqji94d;
+import 'kahoot/host_session.dart' as _iixj3f9r;
+import 'kahoot/join_result.dart' as _i3hvan68;
 import 'kahoot/player.dart' as _ivk98tqa;
 import 'kahoot/question.dart' as _ix1hu9i6;
 import 'kahoot/quiz.dart' as _isre1cxb;
 export 'kahoot/game_event.dart';
 export 'kahoot/game_session.dart';
+export 'kahoot/host_session.dart';
+export 'kahoot/join_result.dart';
 export 'kahoot/player.dart';
 export 'kahoot/question.dart';
 export 'kahoot/quiz.dart';
@@ -48,11 +52,15 @@ class Protocol extends _isc.SerializationManager
         types: const [
           _isc.getType<_id6llbty.GameEvent>,
           _isc.getType<_iaqji94d.GameSession>,
+          _isc.getType<_iixj3f9r.HostSession>,
+          _isc.getType<_i3hvan68.JoinResult>,
           _isc.getType<_ivk98tqa.Player>,
           _isc.getType<_ix1hu9i6.Question>,
           _isc.getType<_isre1cxb.Quiz>,
           _isc.getType<_id6llbty.GameEvent?>,
           _isc.getType<_iaqji94d.GameSession?>,
+          _isc.getType<_iixj3f9r.HostSession?>,
+          _isc.getType<_i3hvan68.JoinResult?>,
           _isc.getType<_ivk98tqa.Player?>,
           _isc.getType<_ix1hu9i6.Question?>,
           _isc.getType<_isre1cxb.Quiz?>,
@@ -68,6 +76,8 @@ class Protocol extends _isc.SerializationManager
         classNames: const [
           'GameEvent',
           'GameSession',
+          'HostSession',
+          'JoinResult',
           'Player',
           'Question',
           'Quiz',
@@ -104,6 +114,12 @@ class Protocol extends _isc.SerializationManager
     if (t == _iaqji94d.GameSession) {
       return _iaqji94d.GameSession.fromJson(data) as T;
     }
+    if (t == _iixj3f9r.HostSession) {
+      return _iixj3f9r.HostSession.fromJson(data) as T;
+    }
+    if (t == _i3hvan68.JoinResult) {
+      return _i3hvan68.JoinResult.fromJson(data) as T;
+    }
     if (t == _ivk98tqa.Player) {
       return _ivk98tqa.Player.fromJson(data) as T;
     }
@@ -118,6 +134,12 @@ class Protocol extends _isc.SerializationManager
     }
     if (t == _isc.getType<_iaqji94d.GameSession?>()) {
       return (data != null ? _iaqji94d.GameSession.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_iixj3f9r.HostSession?>()) {
+      return (data != null ? _iixj3f9r.HostSession.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i3hvan68.JoinResult?>()) {
+      return (data != null ? _i3hvan68.JoinResult.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_ivk98tqa.Player?>()) {
       return (data != null ? _ivk98tqa.Player.fromJson(data) : null) as T;
@@ -164,6 +186,8 @@ class Protocol extends _isc.SerializationManager
     return switch (type) {
       _id6llbty.GameEvent => 'GameEvent',
       _iaqji94d.GameSession => 'GameSession',
+      _iixj3f9r.HostSession => 'HostSession',
+      _i3hvan68.JoinResult => 'JoinResult',
       _ivk98tqa.Player => 'Player',
       _ix1hu9i6.Question => 'Question',
       _isre1cxb.Quiz => 'Quiz',
@@ -188,6 +212,10 @@ class Protocol extends _isc.SerializationManager
         return 'GameEvent';
       case _iaqji94d.GameSession():
         return 'GameSession';
+      case _iixj3f9r.HostSession():
+        return 'HostSession';
+      case _i3hvan68.JoinResult():
+        return 'JoinResult';
       case _ivk98tqa.Player():
         return 'Player';
       case _ix1hu9i6.Question():
@@ -221,6 +249,12 @@ class Protocol extends _isc.SerializationManager
     }
     if (dataClassName == 'GameSession') {
       return deserialize<_iaqji94d.GameSession>(data['data']);
+    }
+    if (dataClassName == 'HostSession') {
+      return deserialize<_iixj3f9r.HostSession>(data['data']);
+    }
+    if (dataClassName == 'JoinResult') {
+      return deserialize<_i3hvan68.JoinResult>(data['data']);
     }
     if (dataClassName == 'Player') {
       return deserialize<_ivk98tqa.Player>(data['data']);

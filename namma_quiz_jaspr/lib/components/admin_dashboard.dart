@@ -3,6 +3,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:namma_kahoot_client/namma_kahoot_client.dart';
+import 'package:universal_web/web.dart' as web;
+
 import '../providers/client_provider.dart';
 import '../providers/game_provider.dart';
 
@@ -14,14 +16,24 @@ class AdminDashboard extends StatefulComponent {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  // Authentication state
+  bool _isAuthenticated = false;
+  String _loginUser = '';
+  String _loginPass = '';
+  String? _loginError;
+
+  // Deck state
   String _titleInput = '';
+  bool _isCreatingQuiz = false;
   List<Quiz> quizzes = [];
   Quiz? selectedQuiz;
   bool loadingQuizzes = true;
   String? errorMsg;
 
+  // Question state
   List<Question> questions = [];
   bool loadingQuestions = false;
+  bool _isAddingQuestion = false;
 
   String qText = '';
   List<String> qOptions = ['', '', '', ''];
@@ -31,7 +43,56 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
-    _loadQuizzes();
+    if (kIsWeb) {
+      try {
+        final auth = web.window.sessionStorage.getItem('nq_admin_auth');
+        if (auth == 'true') {
+          _isAuthenticated = true;
+        }
+      } catch (_) {}
+    }
+    if (_isAuthenticated) {
+      _loadQuizzes();
+    }
+  }
+
+  void _handleLogin() {
+    final user = _loginUser.trim().toLowerCase();
+    final pass = _loginPass.trim();
+
+    // Static credentials for admin panel: admin / admin123 (also accepts admin/admin or nammaquiz)
+    if (user == 'admin' && (pass == 'admin123' || pass == 'admin' || pass == 'nammaquiz')) {
+      if (kIsWeb) {
+        try {
+          web.window.sessionStorage.setItem('nq_admin_auth', 'true');
+        } catch (_) {}
+      }
+      setState(() {
+        _isAuthenticated = true;
+        _loginError = null;
+        _loginUser = '';
+        _loginPass = '';
+      });
+      _loadQuizzes();
+    } else {
+      setState(() {
+        _loginError = 'Incorrect username or password. Please try again.';
+      });
+    }
+  }
+
+  void _handleLogout() {
+    if (kIsWeb) {
+      try {
+        web.window.sessionStorage.removeItem('nq_admin_auth');
+      } catch (_) {}
+    }
+    setState(() {
+      _isAuthenticated = false;
+      selectedQuiz = null;
+      errorMsg = null;
+      _loginError = null;
+    });
   }
 
   Future<void> _loadQuizzes() async {
@@ -52,22 +113,58 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Future<void> _createQuiz() async {
-    if (_titleInput.trim().isEmpty) return;
+    final title = _titleInput.trim();
+    if (title.isEmpty) {
+      setState(() => errorMsg = 'Please enter a quiz title before creating.');
+      return;
+    }
+    if (_isCreatingQuiz) return;
+
+    setState(() {
+      _isCreatingQuiz = true;
+      errorMsg = null;
+    });
+
     try {
-      await context
+      final newQuiz = await context
           .read(clientProvider)
           .admin
           .createQuiz(
             Quiz(
-              title: _titleInput.trim(),
+              title: title,
               creatorId: 1,
               createdAt: DateTime.now(),
             ),
           );
-      _titleInput = '';
+
+      setState(() {
+        _titleInput = '';
+        _isCreatingQuiz = false;
+        selectedQuiz = newQuiz;
+        errorMsg = null;
+      });
+
+      await _loadQuizzes();
+      if (newQuiz.id != null) {
+        await _loadQuestions(newQuiz.id!);
+      }
+    } catch (e) {
+      setState(() {
+        _isCreatingQuiz = false;
+        errorMsg = 'Failed to create quiz: $e';
+      });
+    }
+  }
+
+  Future<void> _deleteQuiz(int quizId) async {
+    try {
+      await context.read(clientProvider).admin.deleteQuiz(quizId);
+      if (selectedQuiz?.id == quizId) {
+        setState(() => selectedQuiz = null);
+      }
       await _loadQuizzes();
     } catch (e) {
-      setState(() => errorMsg = 'Failed to create quiz: $e');
+      setState(() => errorMsg = 'Failed to delete quiz: $e');
     }
   }
 
@@ -89,10 +186,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _addQuestion() async {
     if (selectedQuiz == null) return;
-    if (qText.isEmpty || qOptions.any((c) => c.isEmpty)) {
-      setState(() => errorMsg = 'Please fill all question fields and options.');
+    if (qText.trim().isEmpty || qOptions.any((c) => c.trim().isEmpty)) {
+      setState(() => errorMsg = 'Please fill the question statement and all 4 choices.');
       return;
     }
+    if (_isAddingQuestion) return;
+
+    setState(() {
+      _isAddingQuestion = true;
+      errorMsg = null;
+    });
 
     try {
       await context
@@ -101,8 +204,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           .addQuestion(
             Question(
               quizId: selectedQuiz!.id!,
-              text: qText,
-              options: qOptions,
+              text: qText.trim(),
+              options: qOptions.map((o) => o.trim()).toList(),
               correctOptionIndex: correctOptionIndex,
               timeLimitSeconds: int.tryParse(qTimeStr) ?? 30,
               orderIndex: questions.length,
@@ -114,28 +217,35 @@ class _AdminDashboardState extends State<AdminDashboard> {
         qOptions = ['', '', '', ''];
         correctOptionIndex = 0;
         qTimeStr = '30';
+        _isAddingQuestion = false;
         errorMsg = null;
       });
 
       await _loadQuestions(selectedQuiz!.id!);
     } catch (e) {
-      setState(() => errorMsg = 'Failed to add question: $e');
+      setState(() {
+        _isAddingQuestion = false;
+        errorMsg = 'Failed to add question: $e';
+      });
     }
   }
 
   @override
   Component build(BuildContext context) {
+    if (!_isAuthenticated) {
+      return _buildLoginForm();
+    }
+
     return div(classes: 'scr on', [
       div(classes: 'topbar', [
         button(
+          type: ButtonType.button,
           classes: 'btn btn-icon btn-white btn-sm',
-          events: {
-            'click': (e) {
-              if (selectedQuiz != null) {
-                setState(() => selectedQuiz = null);
-              } else {
-                Router.of(context).push('/');
-              }
+          onClick: () {
+            if (selectedQuiz != null) {
+              setState(() => selectedQuiz = null);
+            } else {
+              Router.of(context).push('/');
             }
           },
           [i([], classes: 'ti ti-arrow-left', attributes: {'style': 'font-size: 16px;'}),],
@@ -147,13 +257,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ]),
         if (selectedQuiz != null)
           button(
+            type: ButtonType.button,
             classes: 'btn btn-brand btn-sm',
-            events: {'click': (e) => context.read(gameProvider.notifier).hostGame(selectedQuiz!.id!)},
+            attributes: {'style': 'margin-right: 8px;'},
+            onClick: () => context.read(gameProvider.notifier).hostGame(selectedQuiz!.id!),
             [
               i([], classes: 'ti ti-player-play-filled', attributes: {'style': 'font-size: 14px;'}),
               Component.text('Host Deck'),
             ],
           ),
+        button(
+          type: ButtonType.button,
+          classes: 'btn btn-white btn-sm',
+          onClick: _handleLogout,
+          [
+            i([], classes: 'ti ti-logout', attributes: {'style': 'font-size: 14px;'}),
+            Component.text('Log Out'),
+          ],
+        ),
       ]),
       div(classes: 'content-narrow p24 flex-col', attributes: {'style': 'flex: 1;'}, [
         if (errorMsg != null)
@@ -165,6 +286,131 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ]),
         if (selectedQuiz == null) _buildQuizList() else _buildQuestionManager(),
       ]),
+    ]);
+  }
+
+  Component _buildLoginForm() {
+    return div(classes: 'scr on flex-col', attributes: {'style': 'min-height: 100vh; background: var(--color-background-secondary);'}, [
+      div(classes: 'topbar', [
+        button(
+          type: ButtonType.button,
+          classes: 'btn btn-icon btn-white btn-sm',
+          onClick: () => Router.of(context).push('/'),
+          [i([], classes: 'ti ti-arrow-left', attributes: {'style': 'font-size: 16px;'}),],
+        ),
+        div(attributes: {'style': 'flex: 1; margin-left: 8px;'}, [
+          span(classes: 'topbar-title', [
+            Component.text('Quiz Studio • Admin Access'),
+          ]),
+        ]),
+        a(
+          href: '/',
+          classes: 'btn btn-white btn-sm',
+          [
+            i([], classes: 'ti ti-home', attributes: {'style': 'font-size: 14px; margin-right: 4px;'}),
+            Component.text('Home'),
+          ],
+        ),
+      ]),
+      div(
+        classes: 'flex-col flex-center',
+        attributes: {
+          'style': 'flex: 1; padding: 48px 24px; display: flex; align-items: center; justify-content: center;',
+        },
+        [
+          div(
+            classes: 'card',
+            attributes: {
+              'style':
+                  'max-width: 420px; width: 100%; border-radius: 20px; padding: 36px 32px; background: #FFFFFF; border: 1px solid var(--color-border-primary); box-shadow: 0 12px 32px -4px rgba(18, 22, 54, 0.08), 0 4px 12px rgba(18, 22, 54, 0.04);',
+            },
+            [
+              div(attributes: {'style': 'text-align: center; margin-bottom: 24px;'}, [
+                div(
+                  attributes: {
+                    'style':
+                        'width: 52px; height: 52px; border-radius: 16px; background: var(--brand-purple-light); color: var(--brand-purple); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px;',
+                  },
+                  [
+                    i([], classes: 'ti ti-shield-lock'),
+                  ],
+                ),
+                h2(classes: 't-section mb8', [Component.text('Admin Portal')]),
+                p(classes: 't-sub', [
+                  Component.text('Sign in to create, manage, and host quiz decks.'),
+                ]),
+              ]),
+
+              if (_loginError != null)
+                div(classes: 'banner banner-err mb20', [
+                  i([], classes: 'ti ti-alert-circle', attributes: {'style': 'font-size: 18px; color: #D85A30;'}),
+                  div(attributes: {'style': 'font-size: 13px; color: #D85A30; font-weight: 600;'}, [
+                    Component.text(_loginError!),
+                  ]),
+                ]),
+
+              form(
+                events: {
+                  'submit': (e) {
+                    e.preventDefault();
+                    _handleLogin();
+                  }
+                },
+                [
+                  div(classes: 'fgroup', [
+                    label(classes: 'flabel', [Component.text('Username')]),
+                    input(
+                      type: InputType.text,
+                      classes: 'finput',
+                      value: _loginUser,
+                      attributes: {
+                        'placeholder': 'Enter username',
+                        'autofocus': 'true',
+                        'autocomplete': 'username',
+                      },
+                      onInput: (String val) => setState(() => _loginUser = val),
+                    ),
+                  ]),
+
+                  div(classes: 'fgroup', [
+                    label(classes: 'flabel', [Component.text('Password')]),
+                    input(
+                      type: InputType.password,
+                      classes: 'finput',
+                      value: _loginPass,
+                      attributes: {
+                        'placeholder': '••••••••',
+                        'autocomplete': 'current-password',
+                      },
+                      onInput: (String val) => setState(() => _loginPass = val),
+                    ),
+                  ]),
+
+                  button(
+                    type: ButtonType.submit,
+                    classes: 'btn btn-brand btn-full btn-lg mb12 mt8',
+                    onClick: _handleLogin,
+                    [
+                      i([], classes: 'ti ti-lock-open', attributes: {'style': 'font-size: 18px; margin-right: 8px;'}),
+                      Component.text('Sign In to Studio'),
+                    ],
+                  ),
+
+                  button(
+                    type: ButtonType.button,
+                    classes: 'btn btn-white btn-full',
+                    onClick: () => Router.of(context).push('/'),
+                    [
+                      i([], classes: 'ti ti-arrow-left', attributes: {'style': 'font-size: 15px; margin-right: 6px;'}),
+                      Component.text('Back to Home'),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     ]);
   }
 
@@ -181,28 +427,43 @@ class _AdminDashboardState extends State<AdminDashboard> {
       // Create Quiz Card
       div(classes: 'card mb24', attributes: {'style': 'padding: 24px; border-radius: 18px;'}, [
         label(classes: 'flabel', [Component.text('New Quiz Deck Title')]),
-        div(classes: 'frow', attributes: {'style': 'gap: 12px; margin-top: 8px;'}, [
-          div(attributes: {'style': 'flex: 1;'}, [
-            input(
-              type: InputType.text,
-              classes: 'finput',
-              value: _titleInput,
-              attributes: {
-                'placeholder': 'e.g. World History Trivia, Science Bowl, Web Dev 101',
-              },
-              onInput: (String val) => _titleInput = val,
-            ),
-          ]),
-          button(
-            classes: 'btn btn-brand',
-            attributes: {'style': 'padding: 12px 24px; cursor: pointer;'},
-            events: {'click': (e) => _createQuiz()},
-            [
-              i([], classes: 'ti ti-plus'),
-              Component.text('Create Deck'),
-            ],
-          ),
-        ]),
+        form(
+          events: {
+            'submit': (e) {
+              e.preventDefault();
+              _createQuiz();
+            }
+          },
+          [
+            div(classes: 'frow', attributes: {'style': 'gap: 12px; margin-top: 8px;'}, [
+              div(attributes: {'style': 'flex: 1;'}, [
+                input(
+                  type: InputType.text,
+                  classes: 'finput',
+                  value: _titleInput,
+                  attributes: {
+                    'placeholder': 'e.g. World History Trivia, Science Bowl, Web Dev 101',
+                  },
+                  onInput: (String val) => setState(() => _titleInput = val),
+                ),
+              ]),
+              button(
+                type: ButtonType.submit,
+                classes: 'btn btn-brand',
+                attributes: {'style': 'padding: 12px 24px; cursor: pointer; white-space: nowrap;'},
+                disabled: _isCreatingQuiz,
+                onClick: _createQuiz,
+                [
+                  if (_isCreatingQuiz)
+                    i([], classes: 'ti ti-loader spin-slow', attributes: {'style': 'font-size: 16px; margin-right: 6px;'})
+                  else
+                    i([], classes: 'ti ti-plus', attributes: {'style': 'font-size: 16px; margin-right: 6px;'}),
+                  Component.text(_isCreatingQuiz ? 'Creating...' : 'Create Deck'),
+                ],
+              ),
+            ]),
+          ],
+        ),
       ]),
 
       // Existing Quizzes List
@@ -241,7 +502,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               },
               [
                 div(classes: 'frow', [
-                  div(attributes: {'style': 'display: flex; align-items: center; gap: 14px;'}, [
+                  div(attributes: {'style': 'display: flex; align-items: center; gap: 14px; flex: 1;'}, [
                     div(classes: 'bento-icon-box', attributes: {
                       'style': 'background: var(--brand-purple-light); color: var(--brand-purple); width: 42px; height: 42px; font-size: 20px; margin-bottom: 0;',
                     }, [
@@ -256,6 +517,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ]),
                   div(attributes: {'style': 'display: flex; align-items: center; gap: 10px;'}, [
                     span(classes: 'chip chip-p', [Component.text('Edit Deck')]),
+                    button(
+                      type: ButtonType.button,
+                      classes: 'btn btn-icon btn-white btn-sm',
+                      attributes: {'title': 'Delete this quiz deck', 'style': 'color: #D85A30;'},
+                      events: {
+                        'click': (e) {
+                          e.stopPropagation();
+                          _deleteQuiz(q.id!);
+                        }
+                      },
+                      [i([], classes: 'ti ti-trash', attributes: {'style': 'font-size: 15px;'}),],
+                    ),
                     i([], classes: 'ti ti-chevron-right', attributes: {'style': 'color: var(--color-text-subtle); font-size: 18px;'}),
                   ]),
                 ]),
@@ -278,10 +551,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
             h2(classes: 't-title', [Component.text(selectedQuiz!.title)]),
           ]),
           button(
+            type: ButtonType.button,
             classes: 'btn btn-white btn-sm',
-            events: {'click': (e) => setState(() => selectedQuiz = null)},
+            onClick: () => setState(() => selectedQuiz = null),
             [
-              i([], classes: 'ti ti-arrow-left', attributes: {'style': 'font-size: 14px;'}),
+              i([], classes: 'ti ti-arrow-left', attributes: {'style': 'font-size: 14px; margin-right: 4px;'}),
               Component.text('Back to All Decks'),
             ],
           ),
@@ -315,7 +589,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 Component.text(questions[idx].text),
               ]),
               span(classes: 'chip chip-t', [
-                i([], classes: 'ti ti-clock', attributes: {'style': 'font-size: 13px;'}),
+                i([], classes: 'ti ti-clock', attributes: {'style': 'font-size: 13px; margin-right: 4px;'}),
                 Component.text('${questions[idx].timeLimitSeconds}s'),
               ]),
             ]),
@@ -330,90 +604,107 @@ class _AdminDashboardState extends State<AdminDashboard> {
         div(classes: 'chip chip-p mb8', [Component.text('QUESTION BUILDER')]),
         h3(classes: 't-title mb16', [Component.text('Add New Question')]),
 
-        div(classes: 'fgroup', [
-          label(classes: 'flabel', [Component.text('Question Statement')]),
-          textarea(
-            [],
-            classes: 'ftextarea',
-            attributes: {'placeholder': 'e.g. Which planet is known as the Red Planet?'},
-            onInput: (String val) => qText = val,
-          ),
-        ]),
-
-        label(classes: 'flabel mb8', [Component.text('Answer Choices (Select the radio of the correct answer)')]),
-        div(attributes: {
-          'style': 'display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px;',
-        }, [
-          for (var i = 0; i < 4; i++)
-            div(attributes: {
-              'style':
-                  'background: var(--color-background-secondary); border: 1.5px solid ${correctOptionIndex == i ? "#26890C" : "var(--color-border-primary)"}; border-radius: 14px; padding: 14px; transition: border-color 0.15s ease;',
-            }, [
-              label(
-                classes: 'flabel',
-                attributes: {
-                  'style':
-                      'display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; cursor: pointer; color: ${correctOptionIndex == i ? "#1D9E75" : "inherit"};',
-                },
-                [
-                  span(attributes: {'style': 'display: flex; align-items: center; gap: 8px; font-weight: 800;'}, [
-                    span([], attributes: {'style': 'width: 10px; height: 10px; border-radius: 50%; background: ${quadBorderColors[i]}; display: inline-block;'}),
-                    Component.text(quadNames[i]),
-                  ]),
-                  input(
-                    attributes: {
-                      'type': 'radio',
-                      'name': 'correctOption',
-                      'value': '$i',
-                      if (correctOptionIndex == i) 'checked': 'true',
-                      'style': 'cursor: pointer;',
-                    },
-                    events: {
-                      'change': (e) => setState(() => correctOptionIndex = i)
-                    },
-                  ),
-                ],
-              ),
-              input(
-                type: InputType.text,
-                classes: 'finput',
-                value: qOptions[i],
-                attributes: {
-                  'placeholder': 'Enter choice ${String.fromCharCode(65 + i)}...',
-                  'style': 'background: #FFFFFF;',
-                },
-                onInput: (String val) {
-                  final newOpts = List<String>.from(qOptions);
-                  newOpts[i] = val;
-                  qOptions = newOpts;
-                },
+        form(
+          events: {
+            'submit': (e) {
+              e.preventDefault();
+              _addQuestion();
+            }
+          },
+          [
+            div(classes: 'fgroup', [
+              label(classes: 'flabel', [Component.text('Question Statement')]),
+              textarea(
+                [Component.text(qText)],
+                classes: 'ftextarea',
+                attributes: {'placeholder': 'e.g. Which planet is known as the Red Planet?'},
+                onInput: (String val) => setState(() => qText = val),
               ),
             ]),
-        ]),
 
-        div(classes: 'fgroup', [
-          label(classes: 'flabel', [Component.text('Time Limit (seconds)')]),
-          input(
-            type: InputType.number,
-            classes: 'finput',
-            value: qTimeStr,
-            attributes: {
-              'placeholder': '30',
-              'min': '5',
-              'max': '180',
-              'style': 'max-width: 180px;',
-            },
-            onInput: (num val) => qTimeStr = val.toString(),
-          ),
-        ]),
+            label(classes: 'flabel mb8', [Component.text('Answer Choices (Select the radio of the correct answer)')]),
+            div(attributes: {
+              'style': 'display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px;',
+            }, [
+              for (var i = 0; i < 4; i++)
+                div(attributes: {
+                  'style':
+                      'background: var(--color-background-secondary); border: 1.5px solid ${correctOptionIndex == i ? "#26890C" : "var(--color-border-primary)"}; border-radius: 14px; padding: 14px; transition: border-color 0.15s ease;',
+                }, [
+                  label(
+                    classes: 'flabel',
+                    attributes: {
+                      'style':
+                          'display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; cursor: pointer; color: ${correctOptionIndex == i ? "#1D9E75" : "inherit"};',
+                    },
+                    [
+                      span(attributes: {'style': 'display: flex; align-items: center; gap: 8px; font-weight: 800;'}, [
+                        span([], attributes: {'style': 'width: 10px; height: 10px; border-radius: 50%; background: ${quadBorderColors[i]}; display: inline-block;'}),
+                        Component.text(quadNames[i]),
+                      ]),
+                      input(
+                        attributes: {
+                          'type': 'radio',
+                          'name': 'correctOption',
+                          'value': '$i',
+                          if (correctOptionIndex == i) 'checked': 'true',
+                          'style': 'cursor: pointer;',
+                        },
+                        events: {
+                          'change': (e) => setState(() => correctOptionIndex = i)
+                        },
+                      ),
+                    ],
+                  ),
+                  input(
+                    type: InputType.text,
+                    classes: 'finput',
+                    value: qOptions[i],
+                    attributes: {
+                      'placeholder': 'Enter choice ${String.fromCharCode(65 + i)}...',
+                      'style': 'background: #FFFFFF;',
+                    },
+                    onInput: (String val) {
+                      setState(() {
+                        final newOpts = List<String>.from(qOptions);
+                        newOpts[i] = val;
+                        qOptions = newOpts;
+                      });
+                    },
+                  ),
+                ]),
+            ]),
 
-        button(
-          classes: 'btn btn-brand btn-full btn-lg mt16',
-          attributes: {'style': 'font-size: 16px; cursor: pointer;'},
-          events: {'click': (e) => _addQuestion()},
-          [
-            i([], classes: 'ti ti-check', attributes: {'style': 'font-size: 18px;'}),
-            Component.text('Save Question to Deck'),
+            div(classes: 'fgroup', [
+              label(classes: 'flabel', [Component.text('Time Limit (seconds)')]),
+              input(
+                type: InputType.number,
+                classes: 'finput',
+                value: qTimeStr,
+                attributes: {
+                  'placeholder': '30',
+                  'min': '5',
+                  'max': '180',
+                  'style': 'max-width: 180px;',
+                },
+                onInput: (num val) => setState(() => qTimeStr = val.toString()),
+              ),
+            ]),
+
+            button(
+              type: ButtonType.submit,
+              classes: 'btn btn-brand btn-full btn-lg mt16',
+              attributes: {'style': 'font-size: 16px; cursor: pointer;'},
+              disabled: _isAddingQuestion,
+              onClick: _addQuestion,
+              [
+                if (_isAddingQuestion)
+                  i([], classes: 'ti ti-loader spin-slow', attributes: {'style': 'font-size: 18px; margin-right: 6px;'})
+                else
+                  i([], classes: 'ti ti-check', attributes: {'style': 'font-size: 18px; margin-right: 6px;'}),
+                Component.text(_isAddingQuestion ? 'Saving Question...' : 'Save Question to Deck'),
+              ],
+            ),
           ],
         ),
       ]),

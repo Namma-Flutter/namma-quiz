@@ -49,8 +49,35 @@ void run(List<String> args) async {
   // Start the server.
   await pod.start();
 
+  // Live rooms only exist in memory, so any room left behind by a previous
+  // process can no longer be resumed.
+  await _sweepStaleRooms(pod);
+
   // Seed default quiz
   await _seedDefaultQuiz(pod);
+}
+
+Future<void> _sweepStaleRooms(Serverpod pod) async {
+  final session = await pod.createSession();
+  try {
+    final stale = await GameSession.db.find(
+      session,
+      where: (t) => t.status.notEquals('finished'),
+    );
+
+    for (final game in stale) {
+      game.status = 'finished';
+      await GameSession.db.updateRow(session, game);
+      await Player.db.deleteWhere(
+        session,
+        where: (t) => t.gameSessionId.equals(game.id),
+      );
+    }
+  } catch (e) {
+    stderr.writeln('Failed to sweep stale game rooms: $e');
+  } finally {
+    await session.close();
+  }
 }
 
 Future<void> _seedDefaultQuiz(Serverpod pod) async {

@@ -1,0 +1,9 @@
+class: HostSession
+fields:
+  pin: String
+  quizId: int
+  hostId: int
+  status: String
+  currentQuestionIndex: int
+  startTime: DateTime?
+  hostToken: String # Secret token, only returned to the host that created the room

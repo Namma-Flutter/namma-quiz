@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_riverpod/jaspr_riverpod.dart';
@@ -24,6 +25,9 @@ class _HostDashboardState extends State<HostDashboard> {
   void initState() {
     super.initState();
     _loadQuizzes();
+    scheduleMicrotask(() {
+      context.read(gameProvider.notifier).tryRestoreSession();
+    });
   }
 
   Future<void> _loadQuizzes() async {
@@ -42,8 +46,12 @@ class _HostDashboardState extends State<HostDashboard> {
   Component build(BuildContext context) {
     final gameState = context.watch(gameProvider);
 
+    if (gameState.isRestoring) {
+      return _buildRestoring();
+    }
+
     if (gameState.session == null) {
-      return _buildSelector(context);
+      return _buildSelector(context, gameState);
     }
 
     final status = gameState.session?.status;
@@ -70,7 +78,22 @@ class _HostDashboardState extends State<HostDashboard> {
     }
   }
 
-  Component _buildSelector(BuildContext context) {
+  Component _buildRestoring() {
+    return div(classes: 'scr on fullscreen-center bg-pattern', [
+      div(classes: 'feedback-card feedback-card-glass', [
+        i([], classes: 'ti ti-loader spin-slow', attributes: {
+          'style': 'font-size: 42px; color: #FFFFFF; margin-bottom: 16px;',
+        }),
+        div(attributes: {
+          'style': 'font-size: 18px; font-weight: 800; color: #FFFFFF;',
+        }, [
+          Component.text('Reconnecting to your host session...'),
+        ]),
+      ]),
+    ]);
+  }
+
+  Component _buildSelector(BuildContext context, GameState gameState) {
     return div(classes: 'scr on', [
       div(classes: 'topbar', [
         button(
@@ -91,6 +114,13 @@ class _HostDashboardState extends State<HostDashboard> {
         ),
       ]),
       div(classes: 'content-narrow p24', [
+        if (gameState.notice != null)
+          div(classes: 'banner banner-warn mb16', [
+            i([], classes: 'ti ti-info-circle', attributes: {'style': 'font-size: 20px; color: #FFA602;'}),
+            div(attributes: {'style': 'font-size: 13px; color: #FFA602; font-weight: 600;'}, [
+              Component.text(gameState.notice!),
+            ]),
+          ]),
         div(attributes: {'style': 'margin-bottom: 24px;'}, [
           div(classes: 'chip chip-p mb8', [Component.text('HOST CONTROLS')]),
           h1(classes: 't-section mb8', [Component.text('Select a Quiz Deck')]),

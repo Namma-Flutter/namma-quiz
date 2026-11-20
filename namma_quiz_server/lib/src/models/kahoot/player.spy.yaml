@@ -4,6 +4,9 @@ fields:
   gameSessionId: int
   name: String
   score: int
+  status: String, default='connected' # 'connected', 'away'
+  answersJson: String? # JSON map of questionIndex -> optionIndex
+  tokenHash: String?, scope=serverOnly # SHA-256 of the player's secret resume token
 indexes:
   player_game_session_idx:
     fields: gameSessionId

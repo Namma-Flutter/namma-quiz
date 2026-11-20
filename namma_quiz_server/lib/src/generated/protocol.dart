@@ -25,11 +25,15 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import 'kahoot/game_event.dart' as _id6llbty;
 import 'kahoot/game_session.dart' as _iaqji94d;
+import 'kahoot/host_session.dart' as _iixj3f9r;
+import 'kahoot/join_result.dart' as _i3hvan68;
 import 'kahoot/player.dart' as _ivk98tqa;
 import 'kahoot/question.dart' as _ix1hu9i6;
 import 'kahoot/quiz.dart' as _isre1cxb;
 export 'kahoot/game_event.dart';
 export 'kahoot/game_session.dart';
+export 'kahoot/host_session.dart';
+export 'kahoot/join_result.dart';
 export 'kahoot/player.dart';
 export 'kahoot/question.dart';
 export 'kahoot/quiz.dart';
@@ -49,11 +53,15 @@ class Protocol extends _is.DatabaseSerializationManager
         types: const [
           _is.getType<_id6llbty.GameEvent>,
           _is.getType<_iaqji94d.GameSession>,
+          _is.getType<_iixj3f9r.HostSession>,
+          _is.getType<_i3hvan68.JoinResult>,
           _is.getType<_ivk98tqa.Player>,
           _is.getType<_ix1hu9i6.Question>,
           _is.getType<_isre1cxb.Quiz>,
           _is.getType<_id6llbty.GameEvent?>,
           _is.getType<_iaqji94d.GameSession?>,
+          _is.getType<_iixj3f9r.HostSession?>,
+          _is.getType<_i3hvan68.JoinResult?>,
           _is.getType<_ivk98tqa.Player?>,
           _is.getType<_ix1hu9i6.Question?>,
           _is.getType<_isre1cxb.Quiz?>,
@@ -70,6 +78,8 @@ class Protocol extends _is.DatabaseSerializationManager
         classNames: const [
           'GameEvent',
           'GameSession',
+          'HostSession',
+          'JoinResult',
           'Player',
           'Question',
           'Quiz',
@@ -133,6 +143,12 @@ class Protocol extends _is.DatabaseSerializationManager
           isNullable: true,
           dartType: 'DateTime?',
         ),
+        _isp.ColumnDefinition(
+          name: 'hostTokenHash',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -182,6 +198,25 @@ class Protocol extends _is.DatabaseSerializationManager
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+          columnDefault: '\'connected\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'answersJson',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'tokenHash',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
         ),
       ],
       foreignKeys: [],
@@ -358,6 +393,12 @@ class Protocol extends _is.DatabaseSerializationManager
     if (t == _iaqji94d.GameSession) {
       return _iaqji94d.GameSession.fromJson(data) as T;
     }
+    if (t == _iixj3f9r.HostSession) {
+      return _iixj3f9r.HostSession.fromJson(data) as T;
+    }
+    if (t == _i3hvan68.JoinResult) {
+      return _i3hvan68.JoinResult.fromJson(data) as T;
+    }
     if (t == _ivk98tqa.Player) {
       return _ivk98tqa.Player.fromJson(data) as T;
     }
@@ -372,6 +413,12 @@ class Protocol extends _is.DatabaseSerializationManager
     }
     if (t == _is.getType<_iaqji94d.GameSession?>()) {
       return (data != null ? _iaqji94d.GameSession.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_iixj3f9r.HostSession?>()) {
+      return (data != null ? _iixj3f9r.HostSession.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i3hvan68.JoinResult?>()) {
+      return (data != null ? _i3hvan68.JoinResult.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_ivk98tqa.Player?>()) {
       return (data != null ? _ivk98tqa.Player.fromJson(data) : null) as T;
@@ -418,6 +465,8 @@ class Protocol extends _is.DatabaseSerializationManager
     return switch (type) {
       _id6llbty.GameEvent => 'GameEvent',
       _iaqji94d.GameSession => 'GameSession',
+      _iixj3f9r.HostSession => 'HostSession',
+      _i3hvan68.JoinResult => 'JoinResult',
       _ivk98tqa.Player => 'Player',
       _ix1hu9i6.Question => 'Question',
       _isre1cxb.Quiz => 'Quiz',
@@ -442,6 +491,10 @@ class Protocol extends _is.DatabaseSerializationManager
         return 'GameEvent';
       case _iaqji94d.GameSession():
         return 'GameSession';
+      case _iixj3f9r.HostSession():
+        return 'HostSession';
+      case _i3hvan68.JoinResult():
+        return 'JoinResult';
       case _ivk98tqa.Player():
         return 'Player';
       case _ix1hu9i6.Question():
@@ -479,6 +532,12 @@ class Protocol extends _is.DatabaseSerializationManager
     }
     if (dataClassName == 'GameSession') {
       return deserialize<_iaqji94d.GameSession>(data['data']);
+    }
+    if (dataClassName == 'HostSession') {
+      return deserialize<_iixj3f9r.HostSession>(data['data']);
+    }
+    if (dataClassName == 'JoinResult') {
+      return deserialize<_i3hvan68.JoinResult>(data['data']);
     }
     if (dataClassName == 'Player') {
       return deserialize<_ivk98tqa.Player>(data['data']);

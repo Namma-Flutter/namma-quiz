@@ -17,6 +17,10 @@ import 'package:namma_kahoot_server/src/generated/kahoot/game_event.dart'
     as _i68w0vuw;
 import 'package:namma_kahoot_server/src/generated/kahoot/game_session.dart'
     as _i7mvdyd7;
+import 'package:namma_kahoot_server/src/generated/kahoot/host_session.dart'
+    as _iyybm0v1;
+import 'package:namma_kahoot_server/src/generated/kahoot/join_result.dart'
+    as _iyvmspja;
 import 'package:namma_kahoot_server/src/generated/kahoot/player.dart'
     as _irte7cmr;
 import 'package:namma_kahoot_server/src/generated/kahoot/question.dart'
@@ -719,7 +723,7 @@ class _KahootEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
-  _ida.Future<_i7mvdyd7.GameSession> createGame(
+  _ida.Future<_iyybm0v1.HostSession> createGame(
     _ist.TestSessionBuilder sessionBuilder,
     int quizId,
     int hostId,
@@ -746,7 +750,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_i7mvdyd7.GameSession>);
+                as _ida.Future<_iyybm0v1.HostSession>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -789,6 +793,7 @@ class _KahootEndpoint {
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
     bool isHost,
+    String token,
   ) {
     var _localTestStreamManager = _ist.TestStreamManager<_i68w0vuw.GameEvent>();
     _ist.callStreamFunctionAndHandleExceptions(
@@ -806,6 +811,7 @@ class _KahootEndpoint {
               arguments: {
                 'pin': pin,
                 'isHost': isHost,
+                'token': token,
               },
               requestedInputStreams: [],
               serializationManager: _serializationManager,
@@ -821,44 +827,7 @@ class _KahootEndpoint {
     return _localTestStreamManager.outputStreamController.stream;
   }
 
-  _ida.Future<void> sendEvent(
-    _ist.TestSessionBuilder sessionBuilder,
-    String pin,
-    _i68w0vuw.GameEvent event,
-    bool toHostOnly,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'kahoot',
-            method: 'sendEvent',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'kahoot',
-          methodName: 'sendEvent',
-          parameters: _ist.testObjectToJson({
-            'pin': pin,
-            'event': event,
-            'toHostOnly': toHostOnly,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<void>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<_irte7cmr.Player?> joinGame(
+  _ida.Future<_iyvmspja.JoinResult?> joinGame(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
     String username,
@@ -885,7 +854,7 @@ class _KahootEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_irte7cmr.Player?>);
+                as _ida.Future<_iyvmspja.JoinResult?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -896,6 +865,7 @@ class _KahootEndpoint {
   _ida.Future<void> startQuestion(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
+    String hostToken,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -908,7 +878,10 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'startQuestion',
-          parameters: _ist.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'hostToken': hostToken,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -927,6 +900,7 @@ class _KahootEndpoint {
   _ida.Future<_i7mvdyd7.GameSession?> nextQuestion(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
+    String hostToken,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -939,7 +913,10 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'nextQuestion',
-          parameters: _ist.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'hostToken': hostToken,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -958,7 +935,7 @@ class _KahootEndpoint {
   _ida.Future<int> submitAnswer(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
-    int playerId,
+    String token,
     int optionIndex,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -974,7 +951,7 @@ class _KahootEndpoint {
           methodName: 'submitAnswer',
           parameters: _ist.testObjectToJson({
             'pin': pin,
-            'playerId': playerId,
+            'token': token,
             'optionIndex': optionIndex,
           }),
           serializationManager: _serializationManager,
@@ -995,7 +972,7 @@ class _KahootEndpoint {
   _ida.Future<bool> hasAnsweredQuestion(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
-    int playerId,
+    String token,
     int questionIndex,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -1011,7 +988,7 @@ class _KahootEndpoint {
           methodName: 'hasAnsweredQuestion',
           parameters: _ist.testObjectToJson({
             'pin': pin,
-            'playerId': playerId,
+            'token': token,
             'questionIndex': questionIndex,
           }),
           serializationManager: _serializationManager,
@@ -1029,25 +1006,25 @@ class _KahootEndpoint {
     });
   }
 
-  _ida.Future<_irte7cmr.Player?> reconnectPlayer(
+  _ida.Future<_irte7cmr.Player?> resumePlayer(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
-    int playerId,
+    String token,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
-            method: 'reconnectPlayer',
+            method: 'resumePlayer',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
-          methodName: 'reconnectPlayer',
+          methodName: 'resumePlayer',
           parameters: _ist.testObjectToJson({
             'pin': pin,
-            'playerId': playerId,
+            'token': token,
           }),
           serializationManager: _serializationManager,
         );
@@ -1129,7 +1106,7 @@ class _KahootEndpoint {
   _ida.Future<bool> leaveGame(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
-    int playerId,
+    String token,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1144,7 +1121,7 @@ class _KahootEndpoint {
           methodName: 'leaveGame',
           parameters: _ist.testObjectToJson({
             'pin': pin,
-            'playerId': playerId,
+            'token': token,
           }),
           serializationManager: _serializationManager,
         );
@@ -1161,24 +1138,26 @@ class _KahootEndpoint {
     });
   }
 
-  _ida.Future<bool> removePlayer(
+  _ida.Future<bool> kickPlayer(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
+    String hostToken,
     int playerId,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'kahoot',
-            method: 'removePlayer',
+            method: 'kickPlayer',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
-          methodName: 'removePlayer',
+          methodName: 'kickPlayer',
           parameters: _ist.testObjectToJson({
             'pin': pin,
+            'hostToken': hostToken,
             'playerId': playerId,
           }),
           serializationManager: _serializationManager,
@@ -1199,6 +1178,7 @@ class _KahootEndpoint {
   _ida.Future<void> endQuestion(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
+    String hostToken,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1211,7 +1191,10 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'endQuestion',
-          parameters: _ist.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'hostToken': hostToken,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1230,6 +1213,7 @@ class _KahootEndpoint {
   _ida.Future<void> showLeaderboard(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
+    String hostToken,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1242,7 +1226,10 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'showLeaderboard',
-          parameters: _ist.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'hostToken': hostToken,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1261,6 +1248,7 @@ class _KahootEndpoint {
   _ida.Future<void> finishGame(
     _ist.TestSessionBuilder sessionBuilder,
     String pin,
+    String hostToken,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1273,7 +1261,10 @@ class _KahootEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'kahoot',
           methodName: 'finishGame',
-          parameters: _ist.testObjectToJson({'pin': pin}),
+          parameters: _ist.testObjectToJson({
+            'pin': pin,
+            'hostToken': hostToken,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

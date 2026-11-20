@@ -68,8 +68,12 @@ class _PlayerBoardState extends State<PlayerBoard> {
   Component build(BuildContext context) {
     final gameState = context.watch(gameProvider);
 
+    if (gameState.isRestoring) {
+      return _buildRestoring();
+    }
+
     if (!gameState.isConnected) {
-      return _buildJoinForm(context);
+      return _buildJoinForm(context, gameState);
     }
 
     final lastEvent = gameState.lastEvent;
@@ -98,7 +102,22 @@ class _PlayerBoardState extends State<PlayerBoard> {
     return _buildLobbyScreen(context, gameState);
   }
 
-  Component _buildJoinForm(BuildContext context) {
+  Component _buildRestoring() {
+    return div(classes: 'scr on fullscreen-center bg-pattern', [
+      div(classes: 'feedback-card feedback-card-glass', [
+        i([], classes: 'ti ti-loader spin-slow', attributes: {
+          'style': 'font-size: 42px; color: #FFFFFF; margin-bottom: 16px;',
+        }),
+        div(attributes: {
+          'style': 'font-size: 18px; font-weight: 800; color: #FFFFFF;',
+        }, [
+          Component.text('Reconnecting to your game...'),
+        ]),
+      ]),
+    ]);
+  }
+
+  Component _buildJoinForm(BuildContext context, GameState gameState) {
     return div(classes: 'scr on', [
       // Compact top navigation back to home
       div(classes: 'topbar', [
@@ -132,6 +151,13 @@ class _PlayerBoardState extends State<PlayerBoard> {
         div(classes: 'card', attributes: {
           'style': 'padding: 28px 24px; border-radius: 20px; box-shadow: 0 12px 36px rgba(18, 22, 54, 0.12);',
         }, [
+          if (gameState.notice != null)
+            div(classes: 'banner banner-warn mb16', [
+              i([], classes: 'ti ti-info-circle', attributes: {'style': 'font-size: 20px; color: #FFA602;'}),
+              div(attributes: {'style': 'font-size: 13px; color: #FFA602; font-weight: 600;'}, [
+                Component.text(gameState.notice!),
+              ]),
+            ]),
           if (errorMessage != null)
             div(classes: 'banner banner-err mb16', [
               i([], classes: 'ti ti-alert-circle', attributes: {'style': 'font-size: 20px; color: #D85A30;'}),

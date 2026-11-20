@@ -16,6 +16,10 @@ import 'package:namma_kahoot_client/src/protocol/kahoot/game_event.dart'
     as _i43ngwq2;
 import 'package:namma_kahoot_client/src/protocol/kahoot/game_session.dart'
     as _i5juiv7o;
+import 'package:namma_kahoot_client/src/protocol/kahoot/host_session.dart'
+    as _i2o97f7q;
+import 'package:namma_kahoot_client/src/protocol/kahoot/join_result.dart'
+    as _ivnq836k;
 import 'package:namma_kahoot_client/src/protocol/kahoot/player.dart'
     as _iowcd9iw;
 import 'package:namma_kahoot_client/src/protocol/kahoot/question.dart'
@@ -315,11 +319,12 @@ class EndpointKahoot extends _isc.EndpointRef {
   @override
   String get name => 'kahoot';
 
-  /// Create a new Game Session from a Quiz and return the PIN
-  _ida.Future<_i5juiv7o.GameSession> createGame(
+  /// Create a new game session from a quiz and return the PIN plus the host's
+  /// secret token. The token is required for every host action.
+  _ida.Future<_i2o97f7q.HostSession> createGame(
     int quizId,
     int hostId,
-  ) => caller.callServerEndpoint<_i5juiv7o.GameSession>(
+  ) => caller.callServerEndpoint<_i2o97f7q.HostSession>(
     'kahoot',
     'createGame',
     {
@@ -328,7 +333,7 @@ class EndpointKahoot extends _isc.EndpointRef {
     },
   );
 
-  /// Get Game Info by PIN
+  /// Get public game info by PIN. Never contains secret tokens.
   _ida.Future<_i5juiv7o.GameSession?> getGameByPin(String pin) =>
       caller.callServerEndpoint<_i5juiv7o.GameSession?>(
         'kahoot',
@@ -336,10 +341,15 @@ class EndpointKahoot extends _isc.EndpointRef {
         {'pin': pin},
       );
 
-  /// Players and Host call this stream to receive real-time updates
+  /// Players and hosts call this stream to receive real-time updates.
+  ///
+  /// The first event is always a `STATE_SNAPSHOT` (or `RESUME_REJECTED`). The
+  /// secret [token] identifies the caller; it is never trusted from a name or
+  /// player id.
   _ida.Stream<_i43ngwq2.GameEvent> gameStream(
     String pin,
     bool isHost,
+    String token,
   ) =>
       caller.callStreamingServerEndpoint<
         _ida.Stream<_i43ngwq2.GameEvent>,
@@ -350,30 +360,17 @@ class EndpointKahoot extends _isc.EndpointRef {
         {
           'pin': pin,
           'isHost': isHost,
+          'token': token,
         },
         {},
       );
 
-  /// Send an event manually over the channel
-  _ida.Future<void> sendEvent(
-    String pin,
-    _i43ngwq2.GameEvent event,
-    bool toHostOnly,
-  ) => caller.callServerEndpoint<void>(
-    'kahoot',
-    'sendEvent',
-    {
-      'pin': pin,
-      'event': event,
-      'toHostOnly': toHostOnly,
-    },
-  );
-
-  /// Join a game
-  _ida.Future<_iowcd9iw.Player?> joinGame(
+  /// Join a lobby. Names are display-only and may repeat; identity is the
+  /// secret token returned in [JoinResult].
+  _ida.Future<_ivnq836k.JoinResult?> joinGame(
     String pin,
     String username,
-  ) => caller.callServerEndpoint<_iowcd9iw.Player?>(
+  ) => caller.callServerEndpoint<_ivnq836k.JoinResult?>(
     'kahoot',
     'joinGame',
     {
@@ -382,66 +379,77 @@ class EndpointKahoot extends _isc.EndpointRef {
     },
   );
 
-  /// Host starts the first question
-  _ida.Future<void> startQuestion(String pin) =>
-      caller.callServerEndpoint<void>(
-        'kahoot',
-        'startQuestion',
-        {'pin': pin},
-      );
+  /// Host starts the first question.
+  _ida.Future<void> startQuestion(
+    String pin,
+    String hostToken,
+  ) => caller.callServerEndpoint<void>(
+    'kahoot',
+    'startQuestion',
+    {
+      'pin': pin,
+      'hostToken': hostToken,
+    },
+  );
 
-  /// Host transitions to the next question
-  _ida.Future<_i5juiv7o.GameSession?> nextQuestion(String pin) =>
-      caller.callServerEndpoint<_i5juiv7o.GameSession?>(
-        'kahoot',
-        'nextQuestion',
-        {'pin': pin},
-      );
+  /// Host transitions to the next question.
+  _ida.Future<_i5juiv7o.GameSession?> nextQuestion(
+    String pin,
+    String hostToken,
+  ) => caller.callServerEndpoint<_i5juiv7o.GameSession?>(
+    'kahoot',
+    'nextQuestion',
+    {
+      'pin': pin,
+      'hostToken': hostToken,
+    },
+  );
 
-  /// Player submits an answer, returning points earned (or 0 if duplicate/invalid)
+  /// Player submits an answer, returning points earned (or 0 if duplicate,
+  /// invalid or the player is away).
   _ida.Future<int> submitAnswer(
     String pin,
-    int playerId,
+    String token,
     int optionIndex,
   ) => caller.callServerEndpoint<int>(
     'kahoot',
     'submitAnswer',
     {
       'pin': pin,
-      'playerId': playerId,
+      'token': token,
       'optionIndex': optionIndex,
     },
   );
 
-  /// Check if a player has already submitted an answer for a question
+  /// Check if a player has already submitted an answer for a question.
   _ida.Future<bool> hasAnsweredQuestion(
     String pin,
-    int playerId,
+    String token,
     int questionIndex,
   ) => caller.callServerEndpoint<bool>(
     'kahoot',
     'hasAnsweredQuestion',
     {
       'pin': pin,
-      'playerId': playerId,
+      'token': token,
       'questionIndex': questionIndex,
     },
   );
 
-  /// Reconnect an existing player across page refresh or tab reconnection
-  _ida.Future<_iowcd9iw.Player?> reconnectPlayer(
+  /// Validate a stored token and return the player it belongs to.
+  _ida.Future<_iowcd9iw.Player?> resumePlayer(
     String pin,
-    int playerId,
+    String token,
   ) => caller.callServerEndpoint<_iowcd9iw.Player?>(
     'kahoot',
-    'reconnectPlayer',
+    'resumePlayer',
     {
       'pin': pin,
-      'playerId': playerId,
+      'token': token,
     },
   );
 
-  /// Get current player details (including updated score)
+  /// Get current player details (including updated score).
   _ida.Future<_iowcd9iw.Player?> getPlayer(int playerId) =>
       caller.callServerEndpoint<_iowcd9iw.Player?>(
         'kahoot',
@@ -449,7 +457,7 @@ class EndpointKahoot extends _isc.EndpointRef {
         {'playerId': playerId},
       );
 
-  /// Get all players currently registered for a game session
+  /// Get all players registered for a game session.
   _ida.Future<List<_iowcd9iw.Player>> getPlayers(String pin) =>
       caller.callServerEndpoint<List<_iowcd9iw.Player>>(
         'kahoot',
@@ -457,52 +465,72 @@ class EndpointKahoot extends _isc.EndpointRef {
         {'pin': pin},
       );
 
-  /// Player leaves the game (e.g. clicked Leave or closed browser)
+  /// Player leaves the game.
   _ida.Future<bool> leaveGame(
     String pin,
-    int playerId,
+    String token,
   ) => caller.callServerEndpoint<bool>(
     'kahoot',
     'leaveGame',
     {
       'pin': pin,
-      'playerId': playerId,
+      'token': token,
     },
   );
 
-  /// Host removes or kicks a player from the lobby / game
-  _ida.Future<bool> removePlayer(
+  /// Host removes or kicks a player. The player's token is banned for the rest
+  /// of the room's lifetime.
+  _ida.Future<bool> kickPlayer(
     String pin,
+    String hostToken,
     int playerId,
   ) => caller.callServerEndpoint<bool>(
     'kahoot',
-    'removePlayer',
+    'kickPlayer',
     {
       'pin': pin,
+      'hostToken': hostToken,
       'playerId': playerId,
     },
   );
 
-  /// Host ends the question, locking responses and revealing the answer
-  _ida.Future<void> endQuestion(String pin) => caller.callServerEndpoint<void>(
+  /// Host ends the question, locking responses and revealing the answer.
+  _ida.Future<void> endQuestion(
+    String pin,
+    String hostToken,
+  ) => caller.callServerEndpoint<void>(
     'kahoot',
     'endQuestion',
-    {'pin': pin},
+    {
+      'pin': pin,
+      'hostToken': hostToken,
+    },
   );
 
-  /// Host shows leaderboard
-  _ida.Future<void> showLeaderboard(String pin) =>
-      caller.callServerEndpoint<void>(
-        'kahoot',
-        'showLeaderboard',
-        {'pin': pin},
-      );
+  /// Host shows leaderboard.
+  _ida.Future<void> showLeaderboard(
+    String pin,
+    String hostToken,
+  ) => caller.callServerEndpoint<void>(
+    'kahoot',
+    'showLeaderboard',
+    {
+      'pin': pin,
+      'hostToken': hostToken,
+    },
+  );
 
-  /// Host finishes the game and reveals the podium (top 3) and full ranks for all players
-  _ida.Future<void> finishGame(String pin) => caller.callServerEndpoint<void>(
+  /// Host finishes the game and reveals the podium (top 3) and full ranks.
+  _ida.Future<void> finishGame(
+    String pin,
+    String hostToken,
+  ) => caller.callServerEndpoint<void>(
     'kahoot',
     'finishGame',
-    {'pin': pin},
+    {
+      'pin': pin,
+      'hostToken': hostToken,
+    },
   );
 }
 
